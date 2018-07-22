@@ -14,8 +14,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.urls import include
 from django.urls import path
+from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='Ighor API')
+
+v1_patterns = ([
+    path('', include('normalizador.urls')),
+    path('auth/', obtain_jwt_token),
+])
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', schema_view),
+    path('v1/', include(v1_patterns)),
+
 ]
