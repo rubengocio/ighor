@@ -91,7 +91,7 @@ DATABASES = {
         'NAME': 'ighor',
         'USER': 'ighor',
         'PASSWORD': 'ighorIGHOR123',
-        'HOST': 'postgresql.ighor-api.svc',
+        'HOST': '10.130.85.243',
         'PORT': '5432',
     }
 }
