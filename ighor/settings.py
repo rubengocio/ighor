@@ -91,7 +91,7 @@ DATABASES = {
         'NAME': 'ighor',
         'USER': 'ighor',
         'PASSWORD': 'ighorIGHOR123',
-        'HOST': '0.0.0.0',
+        'HOST': 'postgresql-ighro-api.193b.starter-ca-central-1.openshiftapps.com',
         'PORT': '5432',
     }
 }
