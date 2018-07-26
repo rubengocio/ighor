@@ -31,6 +31,7 @@
 #
 #     POD_NAME=frontend POD_INDEX=2 ./run-in-container.sh ./manage.py shell
 
+./run-in-container.sh ./manage.py collectstatic --noinput
 
 # Get name of a currently deployed pod by label and index
 POD_INSTANCE_NAME=`oc get pods \
