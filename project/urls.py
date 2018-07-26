@@ -17,6 +17,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_swagger.views import get_swagger_view
+from django.conf.urls.static import static
+from django.conf import settings
 
 schema_view = get_swagger_view(title='Ighor API')
 
@@ -27,3 +29,5 @@ urlpatterns = [
     url(r'^v1/auth/', obtain_jwt_token),
 
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_URL)
