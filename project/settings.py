@@ -22,7 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'f*6_4a98-(n!3d1$*0*pr-tzkt)l&+0gax9o2)8!#-*(hizt=d'
+SECRET_KEY = os.getenv(
+    'DJANGO_SECRET_KEY',
+    # safe value used for development when DJANGO_SECRET_KEY might not be set
+    'f*6_4a98-(n!3d1$*0*pr-tzkt)l&+0gax9o2)8!#-*(hizt=d'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -54,7 +58,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ighor.urls'
+ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ighor.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 # Database
@@ -85,15 +89,20 @@ WSGI_APPLICATION = 'ighor.wsgi.application'
 #    }
 #}
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'project',
+#        'USER': 'project',
+#        'PASSWORD': 'ighorIGHOR123',
+#        'HOST': 'postgresql-ighro-api.193b.starter-ca-central-1.openshiftapps.com',
+#        'PORT': '5432',
+#    }
+#}
+from . import database
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ighor',
-        'USER': 'ighor',
-        'PASSWORD': 'ighorIGHOR123',
-        'HOST': 'postgresql-ighro-api.193b.starter-ca-central-1.openshiftapps.com',
-        'PORT': '5432',
-    }
+    'default': database.config()
 }
 
 
@@ -133,7 +142,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (

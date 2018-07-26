@@ -2,7 +2,7 @@ certifi==2018.4.16
 chardet==3.0.4
 coreapi==2.3.3
 coreschema==0.0.4
-Django==2.0.7
+django>=1.11,<1.12
 django-rest-swagger==2.2.0
 djangorestframework==3.8.2
 djangorestframework-jwt==1.11.0
@@ -20,3 +20,5 @@ requests==2.19.1
 simplejson==3.16.0
 uritemplate==3.0.0
 urllib3==1.23
+gunicorn==19.4.5
+whitenoise==3.3.1
