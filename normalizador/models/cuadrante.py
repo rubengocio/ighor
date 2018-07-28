@@ -12,9 +12,6 @@ class Cuadrante(models.Model):
     localidad = models.ForeignKey(Localidad, on_delete=models.CASCADE)
     estado = models.IntegerField(choices=ESTADO_CHOICES, db_index=True, default=ACTIVO)
 
-    class Meta:
-        unique_together = (("nombre", "localidad"),)
-
     def __str__(self):
         return u"%s" % self.nombre
 

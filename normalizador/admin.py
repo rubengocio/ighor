@@ -8,21 +8,21 @@ from normalizador.models.provincia import Provincia
 
 
 class ProvinciaAdmin(admin.ModelAdmin):
-    pass
-
+    list_display = ('nombre', 'estado')
+    list_filter = ('estado',)
 
 class LocalidadAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'provincia')
-    list_filter = ('provincia',)
+    list_display = ('nombre', 'provincia', 'estado')
+    list_filter = ('provincia', 'estado')
 
 
 class CuadranteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'localidad')
-
+    list_display = ('nombre', 'localidad', 'estado')
+    list_filter = ('estado',)
 
 class BarrioAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'cuadrante')
-    list_filter = ('cuadrante',)
+    list_display = ('nombre', 'cuadrante', 'estado')
+    list_filter = ('cuadrante', 'estado')
 
 
 admin.site.register(Provincia, ProvinciaAdmin)

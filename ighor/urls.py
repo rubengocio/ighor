@@ -20,6 +20,8 @@ from rest_framework_swagger.views import get_swagger_view
 from django.conf.urls.static import static
 from django.conf import settings
 
+from normalizador.views.account import redirect_account
+
 schema_view = get_swagger_view(title='Ighor API')
 
 urlpatterns = [
@@ -27,7 +29,7 @@ urlpatterns = [
     url(r'^$', schema_view),
     url(r'^admin/', admin.site.urls),
     url(r'^v1/auth/', obtain_jwt_token),
-
+    url(r'^accounts/login/', redirect_account)
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_URL)

@@ -8,7 +8,7 @@ from normalizador.enum import ESTADO_CHOICES, ACTIVO, INACTIVO
 
 
 class Provincia(models.Model):
-    nombre = models.CharField(max_length=127, unique=True)
+    nombre = models.CharField(max_length=127, db_index=True)
     estado = models.IntegerField(choices=ESTADO_CHOICES, db_index=True, default=ACTIVO)
 
     def __str__(self):
@@ -16,3 +16,6 @@ class Provincia(models.Model):
 
     def __unicode__(self):
         return u"%s" % self.nombre
+
+
+

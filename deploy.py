@@ -12,10 +12,11 @@ username = 'rgocio'
 token = '09d89a5b0a0889e26d1c755b3dac45bb64f3609b'
 
 print('Updating changes from repo')
-
+input = 'cd /home/rgocio/ighor || source ../env/bin/activate || git checkout -- . || git pull'
 response = requests.post(
-    'https://www.pythonanywhere.com/api/v0/user/{username}/consoles/custom_scripts/9361/execute'.format(username=username),
-    headers={'Authorization': 'Token {token}'.format(token=token)}
+    'https://www.pythonanywhere.com/api/v0/user/{username}/consoles/bash'.format(username=username),
+    headers={'Authorization': 'Token {token}'.format(token=token)},
+    data=input.encode('utf-8')
 )
 print(response)
 
