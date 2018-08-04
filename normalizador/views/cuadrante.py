@@ -11,11 +11,37 @@ from normalizador.serializers.cuadrante import CuadranteSerializer, CuadranteBar
 
 
 class CuadranteViewSet(viewsets.ModelViewSet):
+    """
+          retrieve:
+              Retorna un cuadrante.
+
+          list:
+              Retorna el listado de todos los cuadrantes.
+
+              Filtros:
+
+                  Se pueden filtrar los cuadrantes por nombre utilizando el parametro search.
+                  Ejemplo: localhost/v1/cuadrante/?search=texto
+
+          create:
+              Crea un nuevo cuadrante.
+
+          delete:
+              Elimina un cuadrante.
+
+          update:
+              Actualiza todos los campos de un cuadrante.
+
+          partial_update:
+              Actualiza uno o más campos de un cuadrante.
+
+    """
+
     queryset = Cuadrante.objects.filter(
         estado=ACTIVO,
         localidad__estado=ACTIVO,
         localidad__provincia__estado=ACTIVO
-    )
+    ).order_by('nombre')
     serializer_class = CuadranteSerializer
     permission_classes = [permissions.IsAuthenticated]
 

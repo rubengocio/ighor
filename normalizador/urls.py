@@ -3,6 +3,7 @@ from django.conf.urls import url
 from rest_framework import routers
 
 from normalizador.views.barrio import BarrioViewSet, BarrioCallesRetrieveAPIView
+from normalizador.views.calle import CalleViewSet
 from normalizador.views.cuadrante import CuadranteViewSet, CuadranteBarriosRetrieveAPIView
 from normalizador.views.localidad import LocalidadViewSet, LocalidadCuadrantesRetrieveAPIView
 from normalizador.views.provincia import ProvinciaViewSet, ProvinciaLocalidadesRetrieveAPIView
@@ -13,6 +14,7 @@ router.register(r'provincia', ProvinciaViewSet)
 router.register(r'localidad', LocalidadViewSet)
 router.register(r'cuadrante', CuadranteViewSet)
 router.register(r'barrio', BarrioViewSet)
+router.register(r'calle', CalleViewSet)
 
 urlpatterns = router.urls
 

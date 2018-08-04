@@ -11,12 +11,38 @@ from normalizador.serializers.barrio import BarrioSerializer, BarrioCallesSerial
 
 
 class BarrioViewSet(viewsets.ModelViewSet):
+    """
+          retrieve:
+              Retorna un barrio.
+
+          list:
+              Retorna el listado de todos los barrios.
+
+              Filtros:
+
+                  Se pueden filtrar los barrios por nombre utilizando el parametro search.
+                  Ejemplo: localhost/v1/barrio/?search=texto
+
+          create:
+              Crea un nuevo barrio.
+
+          delete:
+              Elimina un barrio.
+
+          update:
+              Actualiza todos los campos de un barrio.
+
+          partial_update:
+              Actualiza uno o más campos de un barrio.
+
+    """
+
     queryset = Barrio.objects.filter(
         estado=ACTIVO,
         cuadrante__estado=ACTIVO,
         cuadrante__localidad__estado=ACTIVO,
         cuadrante__localidad__provincia__estado=ACTIVO
-    )
+    ).order_by('nombre')
     serializer_class = BarrioSerializer
     permission_classes = [permissions.IsAuthenticated]
 

@@ -12,5 +12,8 @@ CUADRANTE_NO_EXISTE=_("No existe el cuadrante ingresado.")
 
 BARRIO_EXISTE=_(u"Ya existe un barrio con el nombre ingresado.")
 
+CALLE_EXISTS=_(u"Ya existe una calle con el nombre ingresado.")
+CALLE_NO_EXISTE=_("No existe la calle ingresado.")
+
 CAMPO_REQUERIDO=_(u"Este campo es requerido.")
 

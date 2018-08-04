@@ -12,10 +12,36 @@ from normalizador.serializers.localidad import LocalidadSerializer, LocalidadCua
 
 
 class LocalidadViewSet(viewsets.ModelViewSet):
+    """
+      retrieve:
+          Retorna una localidad.
+
+      list:
+          Retorna el listado de todas las localidades.
+
+          Filtros:
+
+              Se pueden filtrar las localidades por nombre utilizando el parametro search.
+              Ejemplo: localhost/v1/localidad/?search=texto
+
+      create:
+          Crea una nueva localidad.
+
+      delete:
+          Elimina la localidad.
+
+      update:
+          Actualiza todos los campos de la localidad.
+
+      partial_update:
+          Actualiza uno o más campos de la localidad.
+
+      """
+
     queryset = Localidad.objects.filter(
         estado=ACTIVO,
         provincia__estado=ACTIVO
-    )
+    ).order_by('nombre')
     serializer_class = LocalidadSerializer
     permission_classes = [permissions.IsAuthenticated]
 

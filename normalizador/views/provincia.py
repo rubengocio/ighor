@@ -13,22 +13,30 @@ from normalizador.serializers.provincia import ProvinciaSerializer, ProvinciaLoc
 class ProvinciaViewSet(viewsets.ModelViewSet):
     """
     retrieve:
-        Return a user instance.
+        Retorna una provincia.
 
     list:
-        Return all users, ordered by most recently joined.
+        Retorna el listado de provincias.
+
+        Filtros:
+
+            Se pueden filtrar las provincias por nombre utilizando el parametro search.
+            Ejemplo: localhost/v1/provincia/?search=texto
 
     create:
-        Create a new user.
+        Crea una nueva provincia.
 
     delete:
-        Remove an existing user.
+        Elimina la provincia.
+
+    update:
+        Actualiza todos los campos de la provincia.
 
     partial_update:
-        Update one or more fields on an existing user.
+        Actualiza uno o más campos de la provincia.
 
     """
-    queryset = Provincia.objects.filter(estado=ACTIVO)
+    queryset = Provincia.objects.filter(estado=ACTIVO).order_by('nombre')
     serializer_class = ProvinciaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
