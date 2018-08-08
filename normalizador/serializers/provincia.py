@@ -36,6 +36,8 @@ class ProvinciaSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         nombre = validated_data.get('nombre', None)
         self.validar_nombre(nombre, instance)
+        if nombre:
+            instance.nombre = nombre
         instance.save()
         return instance
 

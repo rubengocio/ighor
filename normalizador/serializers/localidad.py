@@ -53,6 +53,7 @@ class LocalidadSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         nombre = validated_data.get('nombre', None)
+        codigo_postal = validated_data.get('codigo_postal', None)
         id = self.initial_data.get('provincia').get('id', None)
         provincia = Provincia.objects.filter(pk=id).first()
         if not id:
@@ -61,6 +62,16 @@ class LocalidadSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'provincia':[constants.PROVINCIA_NO_EXISTE]})
 
         self.validar_nombre(nombre, provincia, instance)
+
+        if nombre:
+            instance.nombre = nombre
+
+        if codigo_postal:
+            instance.codigo_postal = codigo_postal
+
+        if provincia:
+            instance.provincia=provincia
+
         instance.save()
         return instance
 

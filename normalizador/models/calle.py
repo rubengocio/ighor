@@ -3,7 +3,7 @@ from django.db import models
 
 
 # Create your models here.
-from normalizador.enum import ESTADO_CHOICES, ACTIVO, INACTIVO
+from normalizador.enum import ESTADO_CHOICES, ACTIVO
 
 
 class Calle(models.Model):
@@ -15,3 +15,4 @@ class Calle(models.Model):
 
     def __unicode__(self):
         return u"%s" % self.nombre
+

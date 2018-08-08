@@ -59,6 +59,13 @@ class CuadranteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'localidad': [constants.LOCALIDAD_NO_EXISTE]})
 
         self.validar_nombre(nombre, localidad, instance)
+
+        if nombre:
+            instance.nombre = nombre
+
+        if localidad:
+            instance.localidad = localidad
+
         instance.save()
         return instance
 

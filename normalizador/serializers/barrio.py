@@ -52,6 +52,7 @@ class BarrioSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         nombre = validated_data.get('nombre', None)
+        codigo_postal = validated_data.get('codigo_postal', None)
         id = self.initial_data.get('cuadrante').get('id', None)
         cuadrante = Cuadrante.objects.filter(pk=id).first()
         if not id:
@@ -60,6 +61,16 @@ class BarrioSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'cuadrante': [constants.CUADRANTE_NO_EXISTE]})
 
         self.validar_nombre(nombre, cuadrante, instance)
+
+        if nombre:
+            instance.nombre = nombre
+
+        if codigo_postal:
+            instance.codigo_postal = codigo_postal
+
+        if cuadrante:
+            instance.cuadrante = cuadrante
+
         instance.save()
         return instance
 

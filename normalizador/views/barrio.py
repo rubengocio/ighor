@@ -7,7 +7,9 @@ from rest_framework.response import Response
 
 from normalizador.enum import ACTIVO, INACTIVO
 from normalizador.models.barrio import Barrio
-from normalizador.serializers.barrio import BarrioSerializer, BarrioCallesSerializer
+from normalizador.models.calles_barrio import CallesBarrio
+from normalizador.serializers.barrio import BarrioSerializer
+from normalizador.serializers.calles_barrio import CallesBarrioSerializer
 
 
 class BarrioViewSet(viewsets.ModelViewSet):
@@ -73,19 +75,18 @@ class BarrioViewSet(viewsets.ModelViewSet):
 
 class BarrioCallesRetrieveAPIView(generics.RetrieveAPIView):
     """
-     Listado de cuadrantes de una localidad
+      retrieve:
+          Retorna un barrio.
+
     """
 
-    queryset = Barrio.objects.filter(
-        estado=ACTIVO,
-        cuadrante__estado=ACTIVO,
-        cuadrante__localidad__estado=ACTIVO,
-        cuadrante__localidad__provincia__estado=ACTIVO
-    )
-    serializer_class = BarrioCallesSerializer
+    queryset = CallesBarrio.objects.all()
+    serializer_class = CallesBarrioSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
