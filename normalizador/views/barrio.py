@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
@@ -7,9 +6,7 @@ from rest_framework.response import Response
 
 from normalizador.enum import ACTIVO, INACTIVO
 from normalizador.models.barrio import Barrio
-from normalizador.models.calles_barrio import CallesBarrio
 from normalizador.serializers.barrio import BarrioSerializer
-from normalizador.serializers.calles_barrio import CallesBarrioSerializer
 
 
 class BarrioViewSet(viewsets.ModelViewSet):

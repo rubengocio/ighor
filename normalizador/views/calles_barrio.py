@@ -64,7 +64,7 @@ class CallesBarrioViewSet(viewsets.ModelViewSet):
 
 class BarrioCallesListAPIView(generics.ListAPIView):
     """
-      retrieve:
+      list:
           Retorna el listado de calles asociadas al barrio ingresado.
 
     """
