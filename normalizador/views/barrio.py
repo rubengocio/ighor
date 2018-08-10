@@ -71,22 +71,3 @@ class BarrioViewSet(viewsets.ModelViewSet):
         instance.estado=INACTIVO
         instance.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class BarrioCallesRetrieveAPIView(generics.RetrieveAPIView):
-    """
-      retrieve:
-          Retorna un barrio.
-
-    """
-
-    queryset = CallesBarrio.objects.all()
-    serializer_class = CallesBarrioSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
-
-

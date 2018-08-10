@@ -32,7 +32,16 @@ class CalleAdmin(admin.ModelAdmin):
 
 
 class CallesBarrioAdmin(admin.ModelAdmin):
-    list_display = ('barrio', 'calle', 'altura_desde', 'altura_hasta', 'referencia', 'plano', 'ubicacion', 'nomenclado')
+    list_display = ('calle', 'altura_desde', 'altura_hasta', 'barrio', 'cuadrante', 'localidad', 'provincia')
+
+    def cuadrante(self, obj):
+        return obj.barrio.cuadrante.nombre
+
+    def localidad(self, obj):
+        return obj.barrio.cuadrante.localidad.nombre
+
+    def provincia(self, obj):
+        return obj.barrio.cuadrante.localidad.provincia.nombre
 
 admin.site.register(Provincia, ProvinciaAdmin)
 admin.site.register(Localidad, LocalidadAdmin)
