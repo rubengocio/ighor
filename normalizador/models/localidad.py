@@ -10,7 +10,7 @@ from normalizador.models.provincia import Provincia
 
 class Localidad(models.Model):
     nombre = models.CharField(max_length=127, db_index=True)
-    codigo_postal = models.CharField(max_length=5)
+    codigo_postal = models.CharField(max_length=10)
     provincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)
     estado = models.IntegerField(choices=ESTADO_CHOICES, db_index=True, default=ACTIVO)
 

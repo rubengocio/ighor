@@ -18,6 +18,7 @@ class LocalidadSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'nombre',
+            'codigo_postal',
             'provincia',
         )
 
