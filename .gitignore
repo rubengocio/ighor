@@ -1,11 +1,7 @@
 *.idea/
 *.log
 *.pot
-*.pyc
-**.pyc
 **/*.pyc
-__pycache__/
-**/__pycache__/
 .env
 .venv
 env/

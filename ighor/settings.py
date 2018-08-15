@@ -44,10 +44,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'normalizador',
     'rest_framework',
     'rest_framework_swagger',
     'user',
+    'normalizador',
 ]
 
 MIDDLEWARE = [

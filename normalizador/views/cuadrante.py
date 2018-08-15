@@ -56,7 +56,7 @@ class CuadranteViewSet(viewsets.ModelViewSet):
 
         search = request.GET.get('search', None)
         if search:
-            queryset = queryset.filter(nombre__icontains=search)
+            queryset = queryset.filter(localidad__nombre__icontains=search)
 
         page = self.paginate_queryset(queryset)
         if page is not None:
