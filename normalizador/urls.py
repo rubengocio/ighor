@@ -7,6 +7,7 @@ from normalizador.views.calle import CalleViewSet
 from normalizador.views.calles_barrio import BarrioCallesListAPIView, CallesBarrioViewSet
 from normalizador.views.cuadrante import CuadranteViewSet, CuadranteBarriosRetrieveAPIView
 from normalizador.views.localidad import LocalidadViewSet, LocalidadCuadrantesRetrieveAPIView
+from normalizador.views.normalizador_barrio import NormalizadorBarrioViewSet
 from normalizador.views.provincia import ProvinciaViewSet, ProvinciaLocalidadesRetrieveAPIView
 
 
@@ -17,6 +18,8 @@ router.register(r'cuadrante', CuadranteViewSet)
 router.register(r'barrio', BarrioViewSet)
 router.register(r'calle', CalleViewSet)
 router.register(r'barrio_calle', CallesBarrioViewSet)
+router.register(r'normalizadorbarrio', NormalizadorBarrioViewSet)
+
 
 
 urlpatterns = router.urls
@@ -25,7 +28,7 @@ urlpatterns += [
     url(r'^provincia/(?P<pk>[0-9]+)/localidades/$', ProvinciaLocalidadesRetrieveAPIView.as_view()),
     url(r'^localidad/(?P<pk>[0-9]+)/cuadrantes/$', LocalidadCuadrantesRetrieveAPIView.as_view()),
     url(r'^cuadrante/(?P<pk>[0-9]+)/barrios/$', CuadranteBarriosRetrieveAPIView.as_view()),
-    url(r'^barrio/(?P<pk>[0-9]+)/calles/$', BarrioCallesListAPIView.as_view())
+    url(r'^barrio/(?P<pk>[0-9]+)/calles/$', BarrioCallesListAPIView.as_view()),
 ]
 
 

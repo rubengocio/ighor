@@ -1,12 +1,14 @@
 from django.contrib import admin
 
 # Register your models here.
+from normalizador.models import Criterio
 from normalizador.models.barrio import Barrio
 from normalizador.models.calle import Calle
 from normalizador.models.calles_barrio import CallesBarrio
 from normalizador.models.cuadrante import Cuadrante
 from normalizador.models.localidad import Localidad
 from normalizador.models.provincia import Provincia
+from normalizador.models.titular import Titular
 
 
 class ProvinciaAdmin(admin.ModelAdmin):
@@ -30,6 +32,8 @@ class CalleAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'estado')
     list_filter = ('estado',)
 
+class TitularAdmin(admin.ModelAdmin):
+    pass
 
 class CallesBarrioAdmin(admin.ModelAdmin):
     list_display = ('calle', 'altura_desde', 'altura_hasta', 'barrio', 'cuadrante', 'localidad', 'provincia')
@@ -49,3 +53,5 @@ admin.site.register(Cuadrante, CuadranteAdmin)
 admin.site.register(Barrio, BarrioAdmin)
 admin.site.register(Calle, CalleAdmin)
 admin.site.register(CallesBarrio, CallesBarrioAdmin)
+admin.site.register(Titular, TitularAdmin)
+admin.site.register(Criterio)

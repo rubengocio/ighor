@@ -25,3 +25,8 @@ class Titular(models.Model):
     fecha_alta = models.IntegerField(blank=True, null=True, default=None)
     tipo_cuenta = models.CharField(max_length=1, blank=True, null=True, default=None)
 
+    def __str__(self):
+        return u"%s" % self.titular
+
+    def __unicode__(self):
+        return u"%s" % self.titular

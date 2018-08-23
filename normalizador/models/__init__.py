@@ -1,0 +1,2 @@
+from normalizador.models.diccionario_barrio import DiccionarioBarrio
+from normalizador.models.criterio import Criterio
