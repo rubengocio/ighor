@@ -2,11 +2,13 @@
 from django.db import connection
 from django.db import transaction
 from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
 from normalizador.models import Criterio
 from normalizador.models import DiccionarioBarrio
@@ -15,16 +17,47 @@ from normalizador.models.filtro_barrio import FiltroBarrio
 from normalizador.serializers.normalizador_barrio import NormalizadorBarrioSerializer
 
 
-class NormalizadorBarrioViewSet(viewsets.ModelViewSet):
-    """
-     Listado de cuadrantes de una localidad
-    """
+class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
+                                mixins.RetrieveModelMixin,
+                                mixins.UpdateModelMixin,
+                                GenericViewSet):
 
     queryset = Barrio.objects.all()
     serializer_class = NormalizadorBarrioSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def retrieve(self, request, *args, **kwargs):
+        """
+            Lista los filtros guardados para el barrio ingresado
+        """
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     def create(self, request, *args, **kwargs):
+        """
+            Retorna un listado de barrios mal escritos cargados en el diccionario de barrios filtrados segun los criterios ingresados en el body
+
+                barrio: id de barrio seleccionado.
+
+                all: true si se desea que se incluya en el listado los datos que ya tienen asignado un barrio. false si no se desea incluirlos.
+
+                barrios_mal: array de ids de barrios mal que se desean actualizar.
+
+                filtros: array de criterios de busqueda.
+
+                    operador: 0 o 1 para (OR o AND)
+
+                    parentesis_abierto: true si hay un prentesis abierto, false si no.
+
+                    criterio: 1 (Like), 2 (Not Like), 3 (=), 4 (<>)
+
+                    valor: texto de busqueda
+
+                    parentesis_cerrado: true si hay un prentesis abierto, false si no.
+
+        """
+
         barrio = request.data.get('barrio', None)
         barrio = get_object_or_404(Barrio, pk=barrio)
         all = request.data.get('all', False)
@@ -32,7 +65,7 @@ class NormalizadorBarrioViewSet(viewsets.ModelViewSet):
         filtros = request.data.get('filtros', None)
 
         query = ' select id, '
-        query += ' nombre, '
+        query += ' nombre '
         #query += ' barrio_id '
         query += ' from normalizador_diccionariobarrio '
         query += ' where 1=1 '
@@ -64,6 +97,30 @@ class NormalizadorBarrioViewSet(viewsets.ModelViewSet):
 
 
     def update(self, request, *args, **kwargs):
+        """
+            Actualiza el barrio del diccionario de barrios para los valores ingresados y devuelve la cantidad de registros actualizados.
+            Ademas guarda la los filtros ingresados para poder usarlos nuevamente.
+
+                barrio: id de barrio seleccionado.
+
+                all: true si se desea que se incluya en el listado los datos que ya tienen asignado un barrio. false si no se desea incluirlos.
+
+                barrios_mal: array de ids de barrios mal que se desean actualizar.
+
+                filtros: array de criterios de busqueda.
+
+                    operador: 0 o 1 para (OR o AND)
+
+                    parentesis_abierto: true si hay un prentesis abierto, false si no.
+
+                    criterio: 1 (Like), 2 (Not Like), 3 (=), 4 (<>)
+
+                    valor: texto de busqueda
+
+                    parentesis_cerrado: true si hay un prentesis abierto, false si no.
+
+        """
+
         barrio = self.get_object()
         barrios_mal = request.data.get('barrios_mal', None)
         filtros = request.data.get('filtros', None)
