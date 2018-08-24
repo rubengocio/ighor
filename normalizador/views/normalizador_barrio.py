@@ -64,10 +64,11 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
         barrios_mal = request.data.get('barrios_mal', None)
         filtros = request.data.get('filtros', None)
 
-        query = ' select id, '
-        query += ' nombre '
-        #query += ' barrio_id '
+        query = ' select normalizador_diccionariobarrio.id, '
+        query += ' normalizador_diccionariobarrio.nombre, '
+        query += ' normalizador_barrio.nombre as barrio '
         query += ' from normalizador_diccionariobarrio '
+        query += ' left join normalizador_barrio on normalizador_barrio.id = normalizador_diccionariobarrio.barrio_id '
         query += ' where 1=1 '
 
         if all is False:
@@ -76,7 +77,7 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
         filters = ''
         for item in filtros:
             criterio = get_object_or_404(Criterio, pk=item.get('criterio', None))
-            filters += u" %s %s nombre %s '%s' %s" % (
+            filters += u" %s %s normalizador_diccionariobarrio.nombre %s '%s' %s" % (
                 u' AND ' if item.get('operador', None) == 1 else u' OR ',
                 u'(' if item.get('parentesis_abierto', False) == True else '',
                 criterio.valor,
@@ -87,13 +88,21 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
         if len(filters) > 0:
             query += filters
 
-        query += ' order by nombre'
+        query += ' order by normalizador_diccionariobarrio.nombre '
 
         cursor = connection.cursor()
         cursor.execute(query)
-        row = cursor.fetchall()
+        rows = cursor.fetchall()
 
-        return Response(row, status=status.HTTP_201_CREATED)
+        result=[]
+        for row in rows:
+            result.append({
+                'id': row[0],
+                'nombre': row[1],
+                'barrio': row[2]
+            })
+
+        return Response(result, status=status.HTTP_201_CREATED)
 
 
     def update(self, request, *args, **kwargs):

@@ -4,7 +4,7 @@ import requests
 
 project_base = '/home/rgocio'
 project_name = 'ighor'
-settings = 'ighor.settings.py'
+settings = 'ighor.base.py'
 project_repo = 'https://github.com/rubengocio/ighor.git'
 
 domain = 'rgocio.pythonanywhere.com'
