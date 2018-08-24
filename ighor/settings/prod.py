@@ -6,7 +6,7 @@ from ighor.settings.base import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rgocio$ighor',
+        'NAME': 'rgocio$default',
         'USER': 'rgocio',
         'PASSWORD': 'ighor123',
         'HOST': 'rgocio.mysql.pythonanywhere-services.com',   # Or an IP Address that your DB is hosted on
