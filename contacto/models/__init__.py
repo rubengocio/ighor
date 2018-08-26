@@ -1,0 +1,2 @@
+from contacto.models.contacto_normalizado import ContactoNormalizado
+from contacto.models.titular import Titular

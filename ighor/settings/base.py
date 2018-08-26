@@ -114,7 +114,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -159,3 +159,6 @@ CORS_ALLOW_METHODS = (
     'POST',
     'PUT',
 )
+
+# Create a Redis instance using redislite
+CELERY_BROKER_URL = 'redis://localhost'

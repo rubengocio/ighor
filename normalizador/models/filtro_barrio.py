@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from normalizador.constants import CHOICES_OPERATOR
 from normalizador.models import Criterio
 from normalizador.models.barrio import Barrio
 
-OR=0
-AND=1
-CHOICES_OPERATOR=(
-    (OR, 'OR'),
-    (AND, 'AND')
-)
 
 class FiltroBarrio(models.Model):
     barrio=models.ForeignKey(Barrio)

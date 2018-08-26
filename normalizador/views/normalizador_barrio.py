@@ -10,11 +10,13 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from contacto.models import ContactoNormalizado
 from normalizador.models import Criterio
 from normalizador.models import DiccionarioBarrio
 from normalizador.models.barrio import Barrio
 from normalizador.models.filtro_barrio import FiltroBarrio
 from normalizador.serializers.normalizador_barrio import NormalizadorBarrioSerializer
+from normalizador.tasks import actualizar_calle_incorrecta
 
 
 class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
@@ -133,7 +135,7 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
         barrio = self.get_object()
         barrios_mal = request.data.get('barrios_mal', None)
         filtros = request.data.get('filtros', None)
-
+        cant_filas=0
         try:
             with transaction.atomic():
                 FiltroBarrio.objects.filter(barrio=barrio).delete()
@@ -153,10 +155,15 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
                     dicccionario.barrio=barrio
                     dicccionario.save()
 
-        except Exception:
+                cant_filas=ContactoNormalizado.actualizar_barrio(diccionario_barrios, barrio)
+
+                actualizar_calle_incorrecta(barrio.id)
+        except Exception as ex:
+            print(ex)
             pass
 
         response={
-            'cant_filas':diccionario_barrios.count()
+            'cant_filas':cant_filas
         }
         return Response(response, status=status.HTTP_201_CREATED)
+

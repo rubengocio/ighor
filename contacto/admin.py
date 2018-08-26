@@ -3,13 +3,14 @@ from django.contrib import admin
 # Register your models here.
 from django.dispatch import receiver
 from import_export import resources
-from import_export import widgets
 from import_export.admin import ImportExportModelAdmin
 from import_export.fields import Field
 from import_export.signals import post_import
 
+from contacto.models import ContactoNormalizado
 from contacto.models.titular import Titular
-from normalizador.models import DiccionarioBarrio
+from contacto.tasks import quitar_espacios, actualizar_provincia, actualizar_localidad
+from normalizador.tasks import actualizar_diccionario_barrio, actualizar_contacto
 
 
 class TitularResource(resources.ModelResource):
@@ -58,9 +59,22 @@ class TitularAdmin(ImportExportModelAdmin):
     list_display = ('titular','descripcion','apellido','nombre')
 
 
+class ContactoNormalizadoAdmin(admin.ModelAdmin):
+    list_display = ('titular', 'apellido', 'nombre', 'estado', 'fecha_actualizacion')
+    raw_id_fields = ('calle', 'barrio', 'provincia', 'localidad')
+
 admin.site.register(Titular, TitularAdmin)
+admin.site.register(ContactoNormalizado, ContactoNormalizadoAdmin)
 
 @receiver(post_import, dispatch_uid='_post_import')
 def _post_import(model, **kwargs):
     # model is the actual model instance which after import
-    DiccionarioBarrio.actualizar_diccionario_barrio()
+    quitar_espacios()
+
+    actualizar_provincia()
+
+    actualizar_localidad()
+
+    actualizar_diccionario_barrio()
+
+    actualizar_contacto()

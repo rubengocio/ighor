@@ -20,3 +20,9 @@ CALLE_BARRIO_EXISTE=_(u"La calle ya se encuentra asociada al barrio.")
 
 CAMPO_REQUERIDO=_(u"Este campo es requerido.")
 
+OR=0
+AND=1
+CHOICES_OPERATOR=(
+    (OR, 'OR'),
+    (AND, 'AND')
+)

@@ -12,9 +12,9 @@ class DiccionarioBarrio(models.Model):
     def actualizar_diccionario_barrio():
         try:
             query = ' insert into normalizador_diccionariobarrio(nombre) '
-            query += ' select trim(domicilio_barrio) '
+            query += ' select domicilio_barrio '
             query += ' from contacto_titular '
-            query += ' where trim(domicilio_barrio) not in (select nombre from normalizador_diccionariobarrio) '
+            query += ' where domicilio_barrio not in (select nombre from normalizador_diccionariobarrio) '
             query += ' and domicilio_barrio is not null '
             query += ' group by domicilio_barrio '
 
