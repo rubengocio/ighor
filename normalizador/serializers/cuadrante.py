@@ -94,7 +94,8 @@ class CuadranteBarriosSerializer(serializers.ModelSerializer):
         for barrio in barrios:
             resutl.append({
                 'id': barrio.id,
-                'nombre': barrio.nombre
+                'nombre': barrio.nombre,
+                'codigo_postal': barrio.codigo_postal
             })
         return resutl
 
