@@ -6,14 +6,25 @@ from normalizador.models.calle import Calle
 
 
 class CallesBarrio(models.Model):
+    PAIR=1
+    ODD=2
+    ALL=3
+    CHOICES_TYPE_NUMBER=(
+        (PAIR,'Par'),
+        (ODD, 'Impar'),
+        (ALL, 'Todas las numeraciones')
+    )
+
     barrio = models.ForeignKey(Barrio)
     calle = models.ForeignKey(Calle)
     altura_desde = models.PositiveIntegerField(null=True, blank=True, default=None)
     altura_hasta = models.PositiveIntegerField(null=True, blank=True, default=None)
     referencia = models.CharField(max_length=127, null=True, blank=True, default=None)
-    plano=models.CharField(max_length=127, null=True, blank=True, default=None)
-    ubicacion=models.CharField(max_length=127, null=True, blank=True, default=None)
-    nomenclado=models.BooleanField(default=False)
+    plano = models.CharField(max_length=127, null=True, blank=True, default=None)
+    ubicacion = models.CharField(max_length=127, null=True, blank=True, default=None)
+    tipo_numeracion = models.IntegerField(choices=CHOICES_TYPE_NUMBER, default=ALL, db_index=True)
+    nomenclado = models.BooleanField(default=False)
+
 
     class Meta:
         unique_together = (("barrio", "calle"),)
