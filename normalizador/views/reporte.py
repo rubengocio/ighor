@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 class ReporteNormalizacionAPIView(generics.ListAPIView):
     """
-    Devuelve un objeto las cantidades de registros normalizados
+    Devuelve un objeto con las cantidades de registros normalizados
 
         'cantidad_registros_barrio_normalizado': Cantidad de registros con barrio normalizado
         'cantidad_registros_barrio_calle_normalizado': Cantidad de registros con calle normalizada
