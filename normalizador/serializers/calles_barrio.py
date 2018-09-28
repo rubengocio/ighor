@@ -50,7 +50,10 @@ class CallesBarrioSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         id_barrio = self.initial_data.get('barrio').get('id', None)
         id_calle = self.initial_data.get('calle').get('id', None)
-        id_tipo_numeracion = self.initial_data.get('tipo_numeracion').get('id', None)
+        tipo_numeracion=self.initial_data.get('tipo_numeracion', None)
+        id_tipo_numeracion=None
+        if tipo_numeracion:
+            id_tipo_numeracion = tipo_numeracion.get('id', None)
 
         barrio = Barrio.objects.filter(pk=id_barrio).first()
         calle = Calle.objects.filter(pk=id_calle).first()
