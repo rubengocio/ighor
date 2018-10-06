@@ -17,8 +17,18 @@ class CallesBarrioViewSet(viewsets.ModelViewSet):
     retrieve:
         Retorna un objeto con una relacion calle por barrio.
 
+        tipo_numeracion:
+            Par: 1
+            Impar: 2
+            Todas las numeraciones: 3
+
     list:
         Retorna el listado de relaciones calles por barrio
+
+        tipo_numeracion:
+            Par: 1
+            Impar: 2
+            Todas las numeraciones: 3
 
         Filtros:
 
@@ -28,14 +38,29 @@ class CallesBarrioViewSet(viewsets.ModelViewSet):
     create:
         Crea un objeto con una relacion calle por barrio.
 
+        tipo_numeracion:
+            Par: 1
+            Impar: 2
+            Todas las numeraciones: 3
+
     delete:
         Elimina una calle por barrio.
 
     update:
         Actualiza todos los valores de una calle por barrio.
 
+        tipo_numeracion:
+            Par: 1
+            Impar: 2
+            Todas las numeraciones: 3
+
     partial_update:
         Actualiza uno o mas valores de una calle por barrio.
+
+        tipo_numeracion:
+            Par: 1
+            Impar: 2
+            Todas las numeraciones: 3
 
     """
     queryset = CallesBarrio.objects.all().order_by('calle')

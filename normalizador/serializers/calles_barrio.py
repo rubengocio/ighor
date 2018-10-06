@@ -12,7 +12,6 @@ from normalizador.serializers.calle import CalleSerializer
 class CallesBarrioSerializer(serializers.ModelSerializer):
     barrio = BarrioSerializer()
     calle = CalleSerializer()
-    tipo_numeracion=serializers.SerializerMethodField()
 
     class Meta:
         model = CallesBarrio
@@ -41,19 +40,11 @@ class CallesBarrioSerializer(serializers.ModelSerializer):
         if calles_barrio.exists():
             raise serializers.ValidationError({'non_field_errors': [constants.CALLE_BARRIO_EXISTE]})
 
-    def get_tipo_numeracion(self, obj):
-        return {
-            'id': obj.tipo_numeracion,
-            'nombre': obj.get_tipo_numeracion_display()
-        }
 
     def create(self, validated_data):
         id_barrio = self.initial_data.get('barrio').get('id', None)
         id_calle = self.initial_data.get('calle').get('id', None)
         tipo_numeracion=self.initial_data.get('tipo_numeracion', None)
-        id_tipo_numeracion=None
-        if tipo_numeracion:
-            id_tipo_numeracion = tipo_numeracion.get('id', None)
 
         barrio = Barrio.objects.filter(pk=id_barrio).first()
         calle = Calle.objects.filter(pk=id_calle).first()
@@ -68,14 +59,14 @@ class CallesBarrioSerializer(serializers.ModelSerializer):
         elif not calle:
             raise serializers.ValidationError({'calle': [constants.CALLE_NO_EXISTE]})
 
-        if not id_tipo_numeracion:
+        if not tipo_numeracion:
             raise serializers.ValidationError({'tipo_numeracion': [constants.CAMPO_REQUERIDO]})
 
         self.validar_calle_barrio(barrio, calle)
 
         validated_data['barrio'] = barrio
         validated_data['calle'] = calle
-        validated_data['tipo_numeracion'] = id_tipo_numeracion
+        validated_data['tipo_numeracion'] = tipo_numeracion
 
         instance = CallesBarrio.objects.create(**validated_data)
         return instance
@@ -83,13 +74,14 @@ class CallesBarrioSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         id_barrio = self.initial_data.get('barrio').get('id', None)
         id_calle = self.initial_data.get('calle').get('id', None)
-        id_tipo_numeracion = self.initial_data.get('tipo_numeracion').get('id', None)
+
 
         altura_desde = validated_data.get('altura_desde', None)
         altura_hasta = validated_data.get('altura_hasta', None)
         referencia = validated_data.get('referencia', None)
         plano = validated_data.get('plano', None)
         ubicacion = validated_data.get('ubicacion', None)
+        tipo_numeracion = validated_data.get('tipo_numeracion', None)
 
         barrio = Barrio.objects.filter(pk=id_barrio).first()
         calle = Calle.objects.filter(pk=id_calle).first()
@@ -104,7 +96,7 @@ class CallesBarrioSerializer(serializers.ModelSerializer):
         elif not calle:
             raise serializers.ValidationError({'calle': [constants.CALLE_NO_EXISTE]})
 
-        if not id_tipo_numeracion:
+        if not tipo_numeracion:
             raise serializers.ValidationError({'tipo_numeracion': [constants.CAMPO_REQUERIDO]})
 
         self.validar_calle_barrio(barrio, calle, instance)
@@ -130,8 +122,8 @@ class CallesBarrioSerializer(serializers.ModelSerializer):
         if ubicacion:
             instance.ubicacion = ubicacion
 
-        if id_tipo_numeracion:
-            instance.tipo_numeracion=id_tipo_numeracion
+        if tipo_numeracion:
+            instance.tipo_numeracion=tipo_numeracion
 
         instance.save()
         return instance
