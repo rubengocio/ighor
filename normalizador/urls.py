@@ -6,7 +6,7 @@ from normalizador.views.barrio import BarrioViewSet
 from normalizador.views.calle import CalleViewSet
 from normalizador.views.calles_barrio import BarrioCallesListAPIView, CallesBarrioViewSet
 from normalizador.views.cuadrante import CuadranteViewSet, CuadranteBarriosRetrieveAPIView
-from normalizador.views.hoja_ruta import HojaRutaRetrieveAPIView
+from normalizador.views.hoja_ruta import HojaRutaRetrieveAPIView, HojaRutaCallesRetrieveAPIView
 from normalizador.views.localidad import LocalidadViewSet, LocalidadCuadrantesRetrieveAPIView
 from normalizador.views.normalizador_barrio import NormalizadorBarrioViewSet
 from normalizador.views.normalizador_calle import NormalizadorCalleViewSet
@@ -32,6 +32,7 @@ urlpatterns += [
     url(r'^cuadrante/(?P<pk>[0-9]+)/barrios/$', CuadranteBarriosRetrieveAPIView.as_view()),
     url(r'^barrio/(?P<pk>[0-9]+)/calles/$', BarrioCallesListAPIView.as_view()),
     url(r'^hoja_ruta/(?P<pk>[0-9]+)/$', HojaRutaRetrieveAPIView.as_view()),
+    url(r'^calles_hoja_ruta/(?P<pk>[0-9]+)/$', HojaRutaCallesRetrieveAPIView.as_view()),
     url(r'^reporte_normalizacion/$', ReporteNormalizacionAPIView.as_view()),
 ]
 

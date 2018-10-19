@@ -89,7 +89,7 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
                 u'(' if item.get('parentesis_abierto', False) == True else '',
                 criterio.valor,
                 item.get('valor', ''),
-                u'(' if item.get('parentesis_cerrado', False) == True else '',
+                u')' if item.get('parentesis_cerrado', False) == True else '',
             )
 
         if len(filters) > 0:
@@ -98,9 +98,12 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
         query += ' group by "normalizador_calleincorrecta"."id", "normalizador_calleincorrecta"."nombre", "normalizador_calle"."nombre" '
         query += ' order by normalizador_calleincorrecta.nombre '
 
-        cursor = connection.cursor()
-        cursor.execute(query)
-        rows = cursor.fetchall()
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        except Exception as ex:
+            rows=[]
 
         result=[]
         for row in rows:

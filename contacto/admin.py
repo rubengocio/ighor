@@ -60,8 +60,28 @@ class TitularAdmin(ImportExportModelAdmin):
 
 
 class ContactoNormalizadoAdmin(admin.ModelAdmin):
-    list_display = ('titular', 'apellido', 'nombre', 'estado', 'fecha_actualizacion')
+    list_display = ('titular', 'apellido', 'nombre', 'estado', '_provincia', '_localidad', '_barrio', '_calle', 'fecha_actualizacion')
     raw_id_fields = ('calle', 'barrio', 'provincia', 'localidad')
+
+    def _provincia(self, obj):
+        if obj.provincia:
+            return 'Si'
+        return 'No'
+
+    def _localidad(self, obj):
+        if obj.localidad:
+            return 'Si'
+        return 'No'
+
+    def _barrio(self, obj):
+        if obj.barrio:
+            return 'Si'
+        return 'No'
+
+    def _calle(self, obj):
+        if obj.calle:
+            return 'Si'
+        return 'No'
 
 admin.site.register(Titular, TitularAdmin)
 admin.site.register(ContactoNormalizado, ContactoNormalizadoAdmin)
