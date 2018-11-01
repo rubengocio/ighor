@@ -11,7 +11,7 @@ from normalizador.views.localidad import LocalidadViewSet, LocalidadCuadrantesRe
 from normalizador.views.normalizador_barrio import NormalizadorBarrioViewSet
 from normalizador.views.normalizador_calle import NormalizadorCalleViewSet
 from normalizador.views.provincia import ProvinciaViewSet, ProvinciaLocalidadesRetrieveAPIView
-from normalizador.views.reporte import ReporteNormalizacionAPIView
+from normalizador.views.reporte import ReporteNormalizacionAPIView, ReporteBarriosSectorRetrieveAPIView
 
 router = routers.DefaultRouter()
 router.register(r'provincia', ProvinciaViewSet)
@@ -34,6 +34,7 @@ urlpatterns += [
     url(r'^hoja_ruta/(?P<pk>[0-9]+)/$', HojaRutaRetrieveAPIView.as_view()),
     url(r'^calles_hoja_ruta/(?P<pk>[0-9]+)/$', HojaRutaCallesRetrieveAPIView.as_view()),
     url(r'^reporte_normalizacion/$', ReporteNormalizacionAPIView.as_view()),
+    url(r'^reporte_barrios_sector/(?P<pk>[0-9]+)/$', ReporteBarriosSectorRetrieveAPIView.as_view()),
 ]
 
 

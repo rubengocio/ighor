@@ -139,6 +139,7 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
         barrios_mal = request.data.get('barrios_mal', None)
         filtros = request.data.get('filtros', None)
         cant_filas=0
+        cant = 0
         try:
             with transaction.atomic():
                 FiltroBarrio.objects.filter(barrio=barrio).delete()
@@ -154,9 +155,11 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
                     )
 
                 diccionario_barrios=DiccionarioBarrio.objects.filter(id__in=barrios_mal)
+
                 for dicccionario in diccionario_barrios:
                     dicccionario.barrio=barrio
                     dicccionario.save()
+                    cant += 1
 
                 cant_filas=ContactoNormalizado.actualizar_barrio(diccionario_barrios, barrio)
 
@@ -166,7 +169,7 @@ class NormalizadorBarrioViewSet(mixins.CreateModelMixin,
             pass
 
         response={
-            'cant_filas':cant_filas
+            'cant_filas':cant
         }
         return Response(response, status=status.HTTP_201_CREATED)
 

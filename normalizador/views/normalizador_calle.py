@@ -144,7 +144,7 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
         calle_barrio = self.get_object()
         calles_mal = request.data.get('calles_mal', None)
         filtros = request.data.get('filtros', None)
-
+        cant=0
         try:
             with transaction.atomic():
                 FiltroCalle.objects.filter(calle_barrio=calle_barrio).delete()
@@ -176,6 +176,7 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
                                 calle_barrio=calle_barrio
                             ).first()
                         )
+                    cant += 1
 
                 cant_filas=ContactoNormalizado.actualizar_calle(diccionario_calles, calle_barrio)
         except Exception as ex:
@@ -183,6 +184,6 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
             pass
 
         response={
-            'cant_filas': cant_filas
+            'cant_filas': cant
         }
         return Response(response, status=status.HTTP_201_CREATED)
