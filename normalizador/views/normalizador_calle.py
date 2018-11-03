@@ -65,21 +65,21 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
         all = request.data.get('all', False)
         filtros = request.data.get('filtros', None)
 
-        query = ' SELECT "normalizador_calleincorrecta"."id", '
-        query += ' "normalizador_calleincorrecta"."nombre", '
-        query += ' "normalizador_calle"."nombre" as "calle" '
-        query += ' FROM "normalizador_calleincorrecta" '
-        query += ' INNER JOIN "contacto_titular" ON ("contacto_titular"."domicilio_calle"="normalizador_calleincorrecta"."nombre") '
-        query += ' INNER JOIN "contacto_contactonormalizado" ON ("contacto_contactonormalizado"."tipo"="contacto_titular"."tipo" AND "contacto_contactonormalizado"."titular"="contacto_titular"."titular" AND "contacto_contactonormalizado"."barrio_id"=%s) '
-        query += ' LEFT JOIN "normalizador_diccionariocalle" ON ("normalizador_diccionariocalle"."calle_incorrecta_id"="normalizador_calleincorrecta"."id") '
-        query += ' LEFT JOIN "normalizador_callesbarrio" ON ("normalizador_callesbarrio"."id"="normalizador_diccionariocalle"."calle_barrio_id") '
-        query += ' LEFT JOIN "normalizador_calle" ON ("normalizador_calle"."id"="normalizador_callesbarrio"."calle_id") '
+        query = ' SELECT normalizador_calleincorrecta.id, '
+        query += ' normalizador_calleincorrecta.nombre, '
+        query += ' normalizador_calle.nombre as calle '
+        query += ' FROM normalizador_calleincorrecta '
+        query += ' INNER JOIN contacto_titular ON (contacto_titular.domicilio_calle=normalizador_calleincorrecta.nombre) '
+        query += ' INNER JOIN contacto_contactonormalizado ON (contacto_contactonormalizado.tipo=contacto_titular.tipo AND contacto_contactonormalizado.titular=contacto_titular.titular AND contacto_contactonormalizado.barrio_id=%s) '
+        query += ' LEFT JOIN normalizador_diccionariocalle ON (normalizador_diccionariocalle.calle_incorrecta_id=normalizador_calleincorrecta.id) '
+        query += ' LEFT JOIN normalizador_callesbarrio ON (normalizador_callesbarrio.id=normalizador_diccionariocalle.calle_barrio_id) '
+        query += ' LEFT JOIN normalizador_calle ON (normalizador_calle.id=normalizador_callesbarrio.calle_id) '
         query += ' where 1=1 '
 
         query = query % calle_barrio.barrio.id
 
         if all is False:
-            query += ' and "normalizador_diccionariocalle"."calle_barrio_id" is null '
+            query += ' and normalizador_diccionariocalle.calle_barrio_id is null '
 
         filters = ''
         for item in filtros:
@@ -95,7 +95,7 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
         if len(filters) > 0:
             query += filters
 
-        query += ' group by "normalizador_calleincorrecta"."id", "normalizador_calleincorrecta"."nombre", "normalizador_calle"."nombre" '
+        query += ' group by normalizador_calleincorrecta.id, normalizador_calleincorrecta.nombre, normalizador_calle.nombre '
         query += ' order by normalizador_calleincorrecta.nombre '
 
         try:
