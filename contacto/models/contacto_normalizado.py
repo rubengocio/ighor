@@ -47,29 +47,29 @@ class ContactoNormalizado(models.Model):
     @staticmethod
     def actualizar_barrio(diccionario_barrios, barrio):
         cant = 0
-        try:
-            barrios_incorrectos=diccionario_barrios.values_list('id', flat=True)
+        #try:
+        barrios_incorrectos=diccionario_barrios.values_list('id', flat=True)
 
-            ids=','.join(str(x) for x in barrios_incorrectos)
+        ids=','.join(str(x) for x in barrios_incorrectos)
 
-            query = ' SELECT "contacto_titular"."tipo", '
-            query += ' "contacto_titular"."titular" '
-            query += ' FROM "contacto_titular" '
-            query += ' INNER JOIN "normalizador_diccionariobarrio" ON "normalizador_diccionariobarrio"."nombre" = "contacto_titular"."domicilio_barrio" '
-            query += ' WHERE "normalizador_diccionariobarrio"."id" IN ( ' + ids + ' ) '
+        query = ' SELECT "contacto_titular"."tipo", '
+        query += ' "contacto_titular"."titular" '
+        query += ' FROM "contacto_titular" '
+        query += ' INNER JOIN "normalizador_diccionariobarrio" ON "normalizador_diccionariobarrio"."nombre" = "contacto_titular"."domicilio_barrio" '
+        query += ' WHERE "normalizador_diccionariobarrio"."id" IN ( ' + ids + ' ) '
 
-            cursor = connection.cursor()
-            cursor.execute(query)
-            rows = cursor.fetchall()
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
 
-            for row in rows:
-                contacto=ContactoNormalizado.objects.get(tipo=row[0], titular=row[1])
-                contacto.barrio=barrio
-                contacto.fecha_actualizacion=datetime.now()
-                contacto.save()
-                cant += 1
-        except Exception:
-            pass
+        for row in rows:
+            contacto=ContactoNormalizado.objects.get(tipo=row[0], titular=row[1])
+            contacto.barrio=barrio
+            contacto.fecha_actualizacion=datetime.now()
+            contacto.save()
+            cant += 1
+        #except Exception:
+        #    pass
         return cant
 
     @staticmethod
