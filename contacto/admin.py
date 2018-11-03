@@ -59,29 +59,65 @@ class TitularAdmin(ImportExportModelAdmin):
     list_display = ('titular','descripcion','apellido','nombre')
 
 
+class IsBarrioNormalizadoFilter(admin.SimpleListFilter):
+    title = 'Barrio Normalizado'
+    parameter_name = '_barrio'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Yes', 'Yes'),
+            ('No', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == 'Yes':
+            return queryset.filter(barrio__isnull=False)
+        elif value == 'No':
+            return queryset.filter(barrio__isnull=True)
+        return queryset
+
+class IsCalleNormalizadoFilter(admin.SimpleListFilter):
+    title = 'Calle Normalizada'
+    parameter_name = '_calle'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('Yes', 'Yes'),
+            ('No', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == 'Yes':
+            return queryset.filter(calle__isnull=False)
+        elif value == 'No':
+            return queryset.filter(calle__isnull=True)
+        return queryset
+
+
 class ContactoNormalizadoAdmin(admin.ModelAdmin):
     list_display = ('titular', 'apellido', 'nombre', 'estado', '_provincia', '_localidad', '_barrio', '_calle', 'fecha_actualizacion')
     raw_id_fields = ('calle', 'barrio', 'provincia', 'localidad')
+    list_filter = (IsBarrioNormalizadoFilter, IsCalleNormalizadoFilter)
 
     def _provincia(self, obj):
-        if obj.provincia:
-            return 'Si'
-        return 'No'
+        return True if obj.provincia else False
 
     def _localidad(self, obj):
-        if obj.localidad:
-            return 'Si'
-        return 'No'
+        return True if obj.localidad else False
 
     def _barrio(self, obj):
-        if obj.barrio:
-            return 'Si'
-        return 'No'
+        return True if obj.barrio else False
 
     def _calle(self, obj):
-        if obj.calle:
-            return 'Si'
-        return 'No'
+        return True if obj.calle else False
+
+    _provincia.boolean = True
+    _localidad.boolean = True
+    _barrio.boolean = True
+    _calle.boolean = True
+
 
 admin.site.register(Titular, TitularAdmin)
 admin.site.register(ContactoNormalizado, ContactoNormalizadoAdmin)

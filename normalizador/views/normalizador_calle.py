@@ -38,13 +38,13 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
 
     def create(self, request, *args, **kwargs):
         """
-            Retorna un listado de barrios mal escritos cargados en el diccionario de barrios filtrados segun los criterios ingresados en el body
+            Retorna un listado de calles mal escritos cargados en el diccionario de calles filtrados segun los criterios ingresados en el body
 
-                barrio: id de barrio seleccionado.
+                calle_barrio: id de calle x barrio seleccionado.
 
-                all: true si se desea que se incluya en el listado los datos que ya tienen asignado un barrio. false si no se desea incluirlos.
+                all: true si se desea que se incluya en el listado los datos que ya tienen asignado una calle. false si no se desea incluirlos.
 
-                barrios_mal: array de ids de barrios mal que se desean actualizar.
+                calles_mal: array de ids de calles mal que se desean actualizar.
 
                 filtros: array de criterios de busqueda.
 
@@ -118,14 +118,14 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
 
     def update(self, request, *args, **kwargs):
         """
-            Actualiza el barrio del diccionario de barrios para los valores ingresados y devuelve la cantidad de registros actualizados.
-            Ademas guarda la los filtros ingresados para poder usarlos nuevamente.
+            Actualiza la calle del diccionario de calles para los valores ingresados y devuelve la cantidad de registros actualizados.
+            Ademas guarda los filtros ingresados para poder usarlos nuevamente.
 
-                barrio: id de barrio seleccionado.
+                calle_barrio: id de calle x barrio seleccionado.
 
-                all: true si se desea que se incluya en el listado los datos que ya tienen asignado un barrio. false si no se desea incluirlos.
+                all: true si se desea que se incluya en el listado los datos que ya tienen asignado una calle. false si no se desea incluirlos.
 
-                barrios_mal: array de ids de barrios mal que se desean actualizar.
+                calles_mal: array de ids de calles mal que se desean actualizar.
 
                 filtros: array de criterios de busqueda.
 
