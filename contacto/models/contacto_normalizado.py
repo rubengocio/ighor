@@ -52,11 +52,11 @@ class ContactoNormalizado(models.Model):
 
         ids=','.join(str(x) for x in barrios_incorrectos)
 
-        query = ' SELECT "contacto_titular"."tipo", '
-        query += ' "contacto_titular"."titular" '
-        query += ' FROM "contacto_titular" '
-        query += ' INNER JOIN "normalizador_diccionariobarrio" ON "normalizador_diccionariobarrio"."nombre" = "contacto_titular"."domicilio_barrio" '
-        query += ' WHERE "normalizador_diccionariobarrio"."id" IN ( ' + ids + ' ) '
+        query = ' SELECT contacto_titular.tipo, '
+        query += ' contacto_titular.titular '
+        query += ' FROM contacto_titular '
+        query += ' INNER JOIN normalizador_diccionariobarrio ON normalizador_diccionariobarrio.nombre = contacto_titular.domicilio_barrio '
+        query += ' WHERE normalizador_diccionariobarrio.id IN ( ' + ids + ' ) '
 
         cursor = connection.cursor()
         cursor.execute(query)
@@ -78,12 +78,12 @@ class ContactoNormalizado(models.Model):
         try:
             ids = ','.join(str(x.id) for x in diccionario_calles)
 
-            query = ' SELECT "contacto_titular"."tipo", '
-            query += ' "contacto_titular"."titular" '
-            query += ' FROM "contacto_titular" '
-            query += ' INNER JOIN "normalizador_calleincorrecta" ON "normalizador_calleincorrecta"."nombre" = "contacto_titular"."domicilio_calle" '
-            query += ' INNER JOIN "normalizador_diccionariocalle" ON "normalizador_diccionariocalle"."calle_incorrecta_id" = "normalizador_calleincorrecta"."id" AND "normalizador_diccionariocalle"."calle_barrio_id"=%s'
-            query += ' WHERE "normalizador_diccionariocalle"."id" IN ( %s ) '
+            query = ' SELECT contacto_titular.tipo, '
+            query += ' contacto_titular.titular '
+            query += ' FROM contacto_titular '
+            query += ' INNER JOIN normalizador_calleincorrecta ON normalizador_calleincorrecta.nombre = contacto_titular.domicilio_calle '
+            query += ' INNER JOIN normalizador_diccionariocalle ON normalizador_diccionariocalle.calle_incorrecta_id = normalizador_calleincorrecta.id AND normalizador_diccionariocalle.calle_barrio_id=%s'
+            query += ' WHERE normalizador_diccionariocalle.id IN ( %s ) '
 
             query = query % (calle_barrio.id, ids)
 
@@ -105,13 +105,13 @@ class ContactoNormalizado(models.Model):
     @staticmethod
     def actualizar_provincia():
         try:
-            query = ' UPDATE "contacto_contactonormalizado" '
-            query += ' SET "provincia_id" = %s '
-            query += ' WHERE "contacto_contactonormalizado"."id" IN ( '
-            query += ' SELECT "contacto_contactonormalizado"."id" '
-            query += ' FROM "contacto_titular" '
-            query += ' INNER JOIN "normalizador_provincia" ON ("normalizador_provincia"."nombre"="contacto_titular"."provincia" AND "normalizador_provincia"."id"=%s)  '
-            query += ' INNER JOIN "contacto_contactonormalizado" ON ("contacto_contactonormalizado"."tipo"="contacto_titular"."tipo" AND "contacto_contactonormalizado"."titular"="contacto_titular"."titular") ) '
+            query = ' UPDATE contacto_contactonormalizado '
+            query += ' SET provincia_id = %s '
+            query += ' WHERE contacto_contactonormalizado.id IN ( '
+            query += ' SELECT contacto_contactonormalizado.id '
+            query += ' FROM contacto_titular '
+            query += ' INNER JOIN normalizador_provincia ON (normalizador_provincia.nombre=contacto_titular.provincia AND normalizador_provincia.id=%s)  '
+            query += ' INNER JOIN contacto_contactonormalizado ON (contacto_contactonormalizado.tipo=contacto_titular.tipo AND contacto_contactonormalizado.titular=contacto_titular.titular) ) '
 
             provincias = Provincia.objects.all()
             for provincia in provincias:
@@ -126,13 +126,13 @@ class ContactoNormalizado(models.Model):
     @staticmethod
     def actualizar_localidad():
         try:
-            query = ' UPDATE "contacto_contactonormalizado" '
-            query += ' SET "localidad_id" = %s '
-            query += ' WHERE "contacto_contactonormalizado"."id" IN ( '
-            query += ' SELECT "contacto_contactonormalizado"."id" '
-            query += ' FROM "contacto_titular" '
-            query += ' INNER JOIN "normalizador_localidad" ON ("normalizador_localidad"."nombre"="contacto_titular"."localidad" AND "normalizador_localidad"."id"=%s)  '
-            query += ' INNER JOIN "contacto_contactonormalizado" ON ("contacto_contactonormalizado"."tipo"="contacto_titular"."tipo" AND "contacto_contactonormalizado"."titular"="contacto_titular"."titular") ) '
+            query = ' UPDATE contacto_contactonormalizado '
+            query += ' SET localidad_id = %s '
+            query += ' WHERE contacto_contactonormalizado.id IN ( '
+            query += ' SELECT contacto_contactonormalizado.id '
+            query += ' FROM contacto_titular '
+            query += ' INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND normalizador_localidad.id=%s)  '
+            query += ' INNER JOIN contacto_contactonormalizado ON (contacto_contactonormalizado.tipo=contacto_titular.tipo AND contacto_contactonormalizado.titular=contacto_titular.titular) ) '
 
             localidades = Localidad.objects.all()
             for localidad in localidades:
