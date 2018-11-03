@@ -100,6 +100,7 @@ class ContactoNormalizadoAdmin(admin.ModelAdmin):
     list_display = ('titular', 'apellido', 'nombre', 'estado', '_provincia', '_localidad', '_barrio', '_calle', 'fecha_actualizacion')
     raw_id_fields = ('calle', 'barrio', 'provincia', 'localidad')
     list_filter = (IsBarrioNormalizadoFilter, IsCalleNormalizadoFilter)
+    search_fields = ('titular','apellido', 'nombre')
 
     def _provincia(self, obj):
         return True if obj.provincia else False
