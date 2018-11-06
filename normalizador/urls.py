@@ -6,12 +6,11 @@ from normalizador.views.barrio import BarrioViewSet
 from normalizador.views.calle import CalleViewSet
 from normalizador.views.calles_barrio import BarrioCallesListAPIView, CallesBarrioViewSet
 from normalizador.views.cuadrante import CuadranteViewSet, CuadranteBarriosRetrieveAPIView
-from normalizador.views.hoja_ruta import HojaRutaRetrieveAPIView, HojaRutaCallesRetrieveAPIView
 from normalizador.views.localidad import LocalidadViewSet, LocalidadCuadrantesRetrieveAPIView
 from normalizador.views.normalizador_barrio import NormalizadorBarrioViewSet
 from normalizador.views.normalizador_calle import NormalizadorCalleViewSet
 from normalizador.views.provincia import ProvinciaViewSet, ProvinciaLocalidadesRetrieveAPIView
-from normalizador.views.reporte import ReporteNormalizacionAPIView, ReporteBarriosSectorRetrieveAPIView
+from normalizador.views.reporte import ReporteNormalizacionBarrioAPIView
 
 router = routers.DefaultRouter()
 router.register(r'provincia', ProvinciaViewSet)
@@ -31,10 +30,8 @@ urlpatterns += [
     url(r'^localidad/(?P<pk>[0-9]+)/cuadrantes/$', LocalidadCuadrantesRetrieveAPIView.as_view()),
     url(r'^cuadrante/(?P<pk>[0-9]+)/barrios/$', CuadranteBarriosRetrieveAPIView.as_view()),
     url(r'^barrio/(?P<pk>[0-9]+)/calles/$', BarrioCallesListAPIView.as_view()),
-    url(r'^hoja_ruta/(?P<pk>[0-9]+)/$', HojaRutaRetrieveAPIView.as_view()),
-    url(r'^calles_hoja_ruta/(?P<pk>[0-9]+)/$', HojaRutaCallesRetrieveAPIView.as_view()),
-    url(r'^reporte_normalizacion/$', ReporteNormalizacionAPIView.as_view()),
-    url(r'^reporte_barrios_sector/(?P<pk>[0-9]+)/$', ReporteBarriosSectorRetrieveAPIView.as_view()),
+    url(r'^reporte_normalizacion_barrio/(?P<pk>[0-9]+)/$', ReporteNormalizacionBarrioAPIView.as_view()),
+
 ]
 
 

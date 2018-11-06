@@ -24,8 +24,14 @@ from normalizador.views.account import redirect_account
 
 schema_view = get_swagger_view(title='Ighor API')
 
+urlpatterns_v1=[
+    url(r'', include('normalizador.urls')),
+    url(r'', include('hoja_ruta.urls')),
+]
+
+
 urlpatterns = [
-    url(r'^v1/', include('normalizador.urls')),
+    url(r'^v1/', include(urlpatterns_v1)),
     url(r'^$', schema_view),
     url(r'^admin/', admin.site.urls),
     url(r'^v1/auth/', obtain_jwt_token),

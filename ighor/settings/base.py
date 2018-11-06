@@ -49,7 +49,8 @@ INSTALLED_APPS = [
     'user',
     'normalizador',
     'contacto',
-    'import_export'
+    'import_export',
+    'hoja_ruta'
 ]
 
 MIDDLEWARE = [

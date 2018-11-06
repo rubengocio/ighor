@@ -30,7 +30,7 @@ class CallesBarrio(models.Model):
         unique_together = (("barrio", "calle"),)
 
     def __str__(self):
-        return u"%s - %s" % (self.barrio.nombre, self.calle.nombre)
+        return u"%s - %s" % (self.calle.nombre, self.barrio.nombre)
 
     def __unicode__(self):
-        return u"%s - %s" % (self.barrio.nombre, self.calle.nombre)
+        return u"%s - %s" % (self.calle.nombre, self.barrio.nombre)
