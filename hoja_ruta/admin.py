@@ -67,7 +67,7 @@ class DetalleHojaRutaInline(admin.TabularInline):
 
 
 class HojaRutaAdmin(admin.ModelAdmin):
-    list_display = ('numero', 'calle_barrio')
+    list_display = ('numero', 'historial', 'calle_barrio', 'altura_desde', 'altura_hasta', 'cant_registros', 'asignada_a', 'estado')
     inlines=[DetalleHojaRutaInline,]
     readonly_fields = (
         'numero',

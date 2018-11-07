@@ -5,7 +5,9 @@ from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
 
-from hoja_ruta.serializers import HojaRutaSerializer, GeneradorHojaRutaSerializer
+from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta
+from hoja_ruta.serializers import HojaRutaSerializer, GeneradorHojaRutaSerializer, HistorialHojaRutaSerializer, \
+    DetalleHojaRutaSerializer
 from normalizador.enum import ACTIVO
 from normalizador.models.barrio import Barrio
 
@@ -17,6 +19,52 @@ class GenerarHojaRutaUpdateAPIView(generics.UpdateAPIView):
         cuadrante__estado=ACTIVO
     )
     serializer_class = GeneradorHojaRutaSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+
+class BarrioHojaRutaRetrieveAPIView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Barrio.objects.filter(
+        estado=ACTIVO,
+        cuadrante__estado=ACTIVO
+    )
+    serializer_class = HistorialHojaRutaSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        historial=HistorialHojaRuta.objects.filter(barrio=instance).order_by('-id').first()
+
+        data=None
+        if historial is None:
+            data={}
+        else:
+            serializer = HistorialHojaRutaSerializer(historial)
+            data=serializer.data
+
+        return Response(data)
+
+
+class HojaRutaRetrieveAPIView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = HojaRuta.objects.all()
+    serializer_class = HojaRutaSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        data=HojaRutaSerializer(instance).data
+        detalles=DetalleHojaRuta.objects.filter(hoja_ruta=instance).order_by('numero_orden')
+        data['detalle_hoja_ruta']=DetalleHojaRutaSerializer(detalles, many=True).data
+
+        return Response(data)
 
 
 class HojaRutaCallesRetrieveAPIView(generics.RetrieveAPIView):
@@ -52,50 +100,3 @@ class HojaRutaCallesRetrieveAPIView(generics.RetrieveAPIView):
             print(ex.message)
 
         return Response(result)
-
-
-
-class HojaRutaRetrieveAPIView(generics.RetrieveAPIView):
-    """
-     Listado de cuadrantes de una localidad
-    """
-
-    queryset = Barrio.objects.filter(
-        estado=ACTIVO,
-        cuadrante__estado=ACTIVO
-    )
-    permission_classes = [permissions.IsAuthenticated]
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-
-
-        return Response({'data':'ok'})
-
-
-"""
-select contacto_titular.nombre,
-		contacto_titular.apellido,
-		normalizador_calle.nombre,
-		contacto_contactonormalizado.altura,
-		contacto_contactonormalizado.piso,
-		contacto_contactonormalizado.departamento,
-		normalizador_barrio.nombre,
-		contacto_titular.telefono,
-		contacto_cliente.productos,
-		contacto_cliente.cualidad,
-		contacto_cliente.meses_deuda,
-		contacto_cliente.monto_deuda,
-		contacto_cliente.inhumados,
-		contacto_titular.titular,
-		contacto_titular.estado,
-		contacto_titular.tipo,
-		contacto_titular.tipo_cuenta,
-		contacto_contactonormalizado.observaciones
-from contacto_contactonormalizado
-inner join contacto_titular on (contacto_titular.tipo=contacto_contactonormalizado.tipo and contacto_titular.titular=contacto_contactonormalizado.titular)
-inner join normalizador_provincia on (normalizador_provincia.id=contacto_contactonormalizado.provincia_id)
-inner join normalizador_barrio on (normalizador_barrio.id=contacto_contactonormalizado.barrio_id)
-inner join normalizador_calle on (normalizador_calle.id=contacto_contactonormalizado.calle_id)
-left join contacto_cliente on (contacto_cliente.numero_documento=contacto_contactonormalizado.titular);
-"""
