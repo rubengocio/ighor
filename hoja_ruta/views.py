@@ -2,7 +2,6 @@
 from django.db import connection
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework import status
 from rest_framework.response import Response
 
 from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta
@@ -10,9 +9,15 @@ from hoja_ruta.serializers import HojaRutaSerializer, GeneradorHojaRutaSerialize
     DetalleHojaRutaSerializer
 from normalizador.enum import ACTIVO
 from normalizador.models.barrio import Barrio
+from django.views.generic import View
+from django.utils import timezone
+from .render import Render
 
 
 class GenerarHojaRutaUpdateAPIView(generics.UpdateAPIView):
+    """
+    Genera las hojas de ruta correspondientes a todas las calles del barrio ingresado y retorna el listado de las mismas
+    """
     permission_classes = [permissions.IsAuthenticated]
     queryset = Barrio.objects.filter(
         estado=ACTIVO,
@@ -30,6 +35,9 @@ class GenerarHojaRutaUpdateAPIView(generics.UpdateAPIView):
 
 
 class BarrioHojaRutaRetrieveAPIView(generics.RetrieveAPIView):
+    """
+    Retorna el listado de las ultimas hojas de ruta generadas
+    """
     permission_classes = [permissions.IsAuthenticated]
     queryset = Barrio.objects.filter(
         estado=ACTIVO,
@@ -52,12 +60,21 @@ class BarrioHojaRutaRetrieveAPIView(generics.RetrieveAPIView):
         return Response(data)
 
 
-class HojaRutaRetrieveAPIView(generics.RetrieveAPIView):
+class HojaRutaRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = HojaRuta.objects.all()
     serializer_class = HojaRutaSerializer
 
     def retrieve(self, request, *args, **kwargs):
+        """
+        Retorna el detalle de contactos asignados a la hoja de ruta
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        Retorna el detalle de contactos asignados a la hoja de ruta
+        """
+
         instance = self.get_object()
 
         data=HojaRutaSerializer(instance).data
@@ -65,6 +82,22 @@ class HojaRutaRetrieveAPIView(generics.RetrieveAPIView):
         data['detalle_hoja_ruta']=DetalleHojaRutaSerializer(detalles, many=True).data
 
         return Response(data)
+
+    def update(self, request, *args, **kwargs):
+        """
+        Utilizado para actualizar el vendedor a quien se asigno la hoja de ruta
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
 
 
 class HojaRutaCallesRetrieveAPIView(generics.RetrieveAPIView):
@@ -100,3 +133,16 @@ class HojaRutaCallesRetrieveAPIView(generics.RetrieveAPIView):
             print(ex.message)
 
         return Response(result)
+
+
+class Pdf(View):
+
+    def get(self, request):
+        hojas_ruta = HojaRuta.objects.all()
+        today = timezone.now()
+        params = {
+            'today': today,
+            'hojas_ruta': hojas_ruta,
+            'request': request
+        }
+        return Render.render('pdf.html', params)
