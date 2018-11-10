@@ -21,7 +21,7 @@ class GeneradorHojaRutaSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        cant_filas=21
+        cant_filas=15
         barrio = instance
         calles_barrio=CallesBarrio.objects.filter(
             barrio=barrio

@@ -2,6 +2,7 @@
 from django.db import connection
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta
@@ -135,10 +136,29 @@ class HojaRutaCallesRetrieveAPIView(generics.RetrieveAPIView):
         return Response(result)
 
 
-class Pdf(View):
+class Pdf(generics.ListAPIView):
+    """
+    Listado de hojas de ruta en pdf
 
-    def get(self, request):
-        hojas_ruta = HojaRuta.objects.all()
+        recibe por query:
+            barrio:  id de barrio del cual se desean las hojas de ruta
+            hojas: si es all, devuelve todas las hojas de ruta del barrio seleccionado.
+                    si es un listado de ids concatenados por coma, devuelve el listado de hojas de ruta seleccionadas.
+
+            ejemplo: localhost:8000/v1/pdf/?barrio=20&hojas=147,148
+
+    """
+    def list(self, request, *args, **kwargs):
+
+        id=request.GET.get('barrio', None)
+        barrio=get_object_or_404(Barrio, pk=id)
+        hojas=request.GET.get('hojas', 'all')
+        historial=HistorialHojaRuta.objects.filter(barrio=barrio).order_by('-id').first()
+        hojas_ruta = HojaRuta.objects.filter(historial=historial)
+
+        if hojas!='all':
+            hojas_ruta=hojas_ruta.filter(numero__in=list(hojas.split(',')))
+
         today = timezone.now()
         params = {
             'today': today,
