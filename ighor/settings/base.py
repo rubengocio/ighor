@@ -163,4 +163,4 @@ CORS_ALLOW_METHODS = (
 
 # Create a Redis instance using redislite
 CELERY_BROKER_URL = 'redis://localhost'
-X_FRAME_OPTIONS = 'ALLOW-FROM https://ighor-69ee3.firebaseapp.com'
+X_FRAME_OPTIONS = 'ALLOW-FROM https://firebaseapp.com'
