@@ -2,12 +2,13 @@
 from django.db import connection
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta
 from hoja_ruta.serializers import HojaRutaSerializer, GeneradorHojaRutaSerializer, HistorialHojaRutaSerializer, \
-    DetalleHojaRutaSerializer
+    DetalleHojaRutaSerializer, ActualizarHojaRutaSerializer
 from normalizador.enum import ACTIVO
 from normalizador.models.barrio import Barrio
 from django.views.generic import View
@@ -166,3 +167,27 @@ class Pdf(generics.ListAPIView):
             'request': request
         }
         return Render.render('pdf.html', params)
+
+class ActualizarHojaRutaCreateAPIView(generics.CreateAPIView):
+    """
+    Recibe un arreglo de hojas de ruta y actualiza cada una de ellas.
+    Retorna el listado actualizado
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = HojaRuta.objects.all()
+    serializer_class = ActualizarHojaRutaSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        list=[]
+        for hoja_ruta in serializer.initial_data:
+            hoja=get_object_or_404(HojaRuta, id=hoja_ruta['id'])
+            list.append(hoja)
+            s=ActualizarHojaRutaSerializer(hoja, hoja_ruta)
+            if s.is_valid():
+                s.save()
+
+        serializer=ActualizarHojaRutaSerializer(list, many=True)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

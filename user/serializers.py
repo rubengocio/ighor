@@ -26,17 +26,17 @@ class UserSerializer(serializers.ModelSerializer):
 
         if obj.groups.filter(name=constants.GROUP_VENTAS).first():
             rol = {
-                'id': 'VEN',
+                'iso': 'VEN',
                 'name': constants.ADMINISTRADOR
             }
         elif obj.groups.filter(name=constants.GROUP_GERENCIA).first():
             rol = {
-                'id': 'GER',
+                'iso': 'GER',
                 'name': constants.GERENCIA
             }
         elif obj.groups.filter(name=constants.GROUP_VENDEDOR).first():
             rol = {
-                'id': 'UVE',
+                'iso': 'UVE',
                 'name': constants.VENDEDOR
             }
 

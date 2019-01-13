@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 
 from contacto.models import ContactoNormalizado
 from hoja_ruta.models import HojaRuta, DetalleHojaRuta, HistorialHojaRuta
@@ -242,3 +244,57 @@ class HojaRutaSerializer(serializers.ModelSerializer):
             'id': obj.estado,
             'nombre': obj.get_estado_display()
         }
+
+
+class ActualizarHojaRutaSerializer(serializers.ModelSerializer):
+    calle = serializers.SerializerMethodField()
+    asignada_a=serializers.SerializerMethodField()
+    estado=serializers.SerializerMethodField()
+
+    class Meta:
+        model=HojaRuta
+        fields=(
+            'id',
+            'numero',
+            'calle',
+            'altura_desde',
+            'altura_hasta',
+            'cant_registros',
+            'asignada_a',
+            'estado'
+        )
+
+    def get_calle(self, obj):
+        calle=CalleSerializer(obj.calle_barrio.calle).data
+        return calle
+
+    def get_asignada_a(self, obj):
+        if obj.asignada_a:
+            return {
+                'id': obj.asignada_a.id,
+                'first_name': obj.asignada_a.first_name,
+                'last_name': obj.asignada_a.last_name,
+                'email': obj.asignada_a.email
+            }
+        else:
+            return None
+
+    def get_estado(self, obj):
+        return {
+            'id': obj.estado,
+            'nombre': obj.get_estado_display()
+        }
+
+    def update(self, instance, validated_data):
+        try:
+            vendedor_id = self.initial_data['asignada_a']['id']
+            vendedor=get_object_or_404(User, id=vendedor_id)
+        except Exception:
+            vendedor=None
+
+        if vendedor:
+            instance.asignada_a=vendedor
+
+        instance.save()
+        return instance
+
