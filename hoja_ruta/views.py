@@ -172,6 +172,61 @@ class ActualizarHojaRutaCreateAPIView(generics.CreateAPIView):
     """
     Recibe un arreglo de hojas de ruta y actualiza cada una de ellas.
     Retorna el listado actualizado
+
+    example:
+
+        [
+          {
+            "id": 3,
+            "numero": "3",
+            "calle": {
+              "id": 4455,
+              "nombre": " 24 DE FEBRERO"
+            },
+            "altura_desde": "158",
+            "altura_hasta": "158",
+            "cant_registros": 1,
+            "asignada_a": {
+              "id": 2,
+              "first_name": "Marina",
+              "last_name": "Gadea",
+              "email": "vendedor@vendedor.com",
+              "rol": {
+                "name": "Vendedor",
+                "id": "UVE"
+              }
+            },
+            "estado": {
+              "id": 1,
+              "nombre": "Sin Asignar"
+            }
+          },
+          {
+            "id": 4,
+            "numero": "4",
+            "calle": {
+              "id": 166,
+              "nombre": " 25 DE MAYO"
+            },
+            "altura_desde": "3634",
+            "altura_hasta": "3634",
+            "cant_registros": 1,
+            "asignada_a": {
+              "id": 3,
+              "first_name": "Ruben",
+              "last_name": "Gocio",
+              "email": "vendedor2@vendedor.com",
+              "rol": {
+                "name": "Vendedor",
+                "id": "UVE"
+              }
+            },
+            "estado": {
+              "id": 1,
+              "nombre": "Sin Asignar"
+            }
+          }
+        ]
     """
 
     permission_classes = [permissions.IsAuthenticated]
