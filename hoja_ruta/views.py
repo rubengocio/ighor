@@ -4,6 +4,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta
@@ -138,6 +139,7 @@ class HojaRutaCallesRetrieveAPIView(generics.RetrieveAPIView):
 
 
 class Pdf(generics.ListAPIView):
+    permission_classes = (AllowAny,)
     """
     Listado de hojas de ruta en pdf
 
