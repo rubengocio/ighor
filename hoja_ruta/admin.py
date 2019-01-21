@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from contacto.models import ContactoNormalizado
-from hoja_ruta.models import HojaRuta, DetalleHojaRuta
+from hoja_ruta.models import HojaRuta, DetalleHojaRuta, Observacion, Producto
 
 
 class DetalleHojaRutaInline(admin.TabularInline):
@@ -21,9 +21,10 @@ class DetalleHojaRutaInline(admin.TabularInline):
         'altura',
         'piso',
         'departamento',
-        'observaciones'
+        'observacion',
+        'producto'
     )
-    exclude = ('id',)
+    exclude = ('id', 'is_completa')
 
     def apellido(self, obj):
         contact=ContactoNormalizado.objects.filter(tipo=obj.tipo, titular=obj.titular).first()
@@ -61,9 +62,6 @@ class DetalleHojaRutaInline(admin.TabularInline):
         contact = ContactoNormalizado.objects.filter(tipo=obj.tipo, titular=obj.titular).first()
         return contact.departamento
 
-    def observaciones(self, obj):
-        contact = ContactoNormalizado.objects.filter(tipo=obj.tipo, titular=obj.titular).first()
-        return contact.observaciones
 
 
 class HojaRutaAdmin(admin.ModelAdmin):
@@ -84,3 +82,5 @@ class HojaRutaAdmin(admin.ModelAdmin):
 
 
 admin.site.register(HojaRuta, HojaRutaAdmin)
+admin.site.register(Observacion)
+admin.site.register(Producto)

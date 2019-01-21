@@ -32,10 +32,13 @@ class HojaRuta(models.Model):
     SIN_ASIGNAR=1
     ASIGNADA=2
     CON_DEVOLUCION=3
+    DEVOLUCION_INCOMPLETA=4
+
     CHOICES_ESTADO=(
         (SIN_ASIGNAR, u'Sin Asignar'),
         (ASIGNADA, u'Asignada'),
-        (CON_DEVOLUCION, u'Cerrada')
+        (CON_DEVOLUCION, u'Cerrada'),
+        (DEVOLUCION_INCOMPLETA, u'Devolucion Incompleta')
     )
 
 
@@ -86,6 +89,25 @@ class HojaRuta(models.Model):
     def detalles(self):
         return self.detalle_hoja_ruta.all()
 
+    def update_status(self):
+
+        detalles_hojas=DetalleHojaRuta.objects.filter(hoja_ruta=self)
+        total_rows=detalles_hojas.count()
+        cant_completas=0
+
+        for detalle in detalles_hojas:
+            if detalle.is_completa:
+                cant_completas +=1
+
+        if cant_completas > 1 and cant_completas != total_rows:
+            self.estado=HojaRuta.DEVOLUCION_INCOMPLETA
+            self.save()
+
+        if cant_completas == total_rows:
+            self.estado = HojaRuta.CON_DEVOLUCION
+            self.save()
+
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
@@ -96,12 +118,34 @@ class HojaRuta(models.Model):
              update_fields=None)
 
 
+class Observacion(models.Model):
+    nombre=models.CharField(max_length=125, unique=True)
+
+    def __str__(self):
+        return u'%s' % self.nombre
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
+
+class Producto(models.Model):
+    nombre=models.CharField(max_length=125, unique=True)
+
+    def __str__(self):
+        return u'%s' % self.nombre
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
+
 
 class DetalleHojaRuta(models.Model):
     hoja_ruta=models.ForeignKey(HojaRuta, related_name='detalle_hoja_ruta')
     numero_orden=models.CharField(max_length=2)
     tipo = models.IntegerField(blank=True, null=True, default=0)
     titular = models.IntegerField(blank=True, null=True, default=0)
+    observacion=models.ForeignKey(Observacion, null=True, blank=True)
+    producto=models.ForeignKey(Producto, null=True, blank=True)
+    is_completa=models.BooleanField(default=False)
 
     contact=None
     def __str__(self):
@@ -164,11 +208,11 @@ class DetalleHojaRuta(models.Model):
             self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.departamento
 
-    @property
-    def observaciones(self):
-        if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.observaciones
 
+    def save(self, *args, **kwargs):
 
+        self.is_completa = True if self.observacion or self.producto else False
 
+        super(DetalleHojaRuta, self).save(*args, **kwargs)
+
+        self.hoja_ruta.update_status()

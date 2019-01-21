@@ -3,13 +3,14 @@ from django.db import connection
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework import viewsets
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta
+from hoja_ruta.models import HistorialHojaRuta, HojaRuta, DetalleHojaRuta, Observacion, Producto
 from hoja_ruta.serializers import HojaRutaSerializer, GeneradorHojaRutaSerializer, HistorialHojaRutaSerializer, \
-    DetalleHojaRutaSerializer, ActualizarHojaRutaSerializer
+    DetalleHojaRutaSerializer, ActualizarHojaRutaSerializer, ObservacionSerializer, ProductoSerializer
 from normalizador.enum import ACTIVO
 from normalizador.models.barrio import Barrio
 from django.views.generic import View
@@ -61,6 +62,192 @@ class BarrioHojaRutaRetrieveAPIView(generics.RetrieveAPIView):
             data=serializer.data
 
         return Response(data)
+
+
+class DetalleHojaRutaVendedorListCreateAPIView(generics.ListCreateAPIView):
+    """
+            GET Listado de detalles de hojas de ruta de un vendedor. El vendedor es obtenido del token de session
+
+            Se puede filtrar los detalles por el numero de hoja de ruta
+
+            example GET:
+
+                http://localhost:8000/v1/vendedor_detalle_hoja_ruta/?numero=143
+
+
+            POST Recibe un array de objetos detalles y los actualiza
+
+            example body POST:
+
+                [
+                    {
+                        "id": 1042,
+                        "numero_orden": "01",
+                        "tipo": 1,
+                        "titular": 313227,
+                        "apellido": "MENZIO              ",
+                        "nombre": "HECTOR              ",
+                        "provincia": "CORDOBA",
+                        "localidad": "CORDOBA",
+                        "barrio": "ALBERDI",
+                        "calle": " DEAN FUNES",
+                        "altura": "11",
+                        "piso": "PB",
+                        "departamento": "A ",
+                        "producto": null,
+                        "observacion": {
+                            "id": 1,
+                            "nombre": "No vive más alli"
+                        }
+                    },
+                    {
+                        "id": 1043,
+                        "numero_orden": "02",
+                        "tipo": 1,
+                        "titular": 498472,
+                        "apellido": "IBOS                ",
+                        "nombre": "JOSE RICARDO        ",
+                        "provincia": "CORDOBA",
+                        "localidad": "CORDOBA",
+                        "barrio": "ALBERDI",
+                        "calle": " DEAN FUNES",
+                        "altura": "11",
+                        "piso": "1",
+                        "departamento": "D ",
+                        "producto": null,
+                        "observacion": {
+                            "id": 2,
+                            "nombre": "No tiene tarjeta"
+                        }
+                    }
+                ]
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = DetalleHojaRuta.objects.all()
+    serializer_class = DetalleHojaRutaSerializer
+
+    def get_queryset(self):
+        user=self.request.user
+        return self.queryset.filter(hoja_ruta__asignada_a=user)
+
+    def list(self, request, *args, **kwargs):
+        """
+        Listado de detalles de hojas de ruta de un vendedor. El vendedor es obtenido del token de session
+
+        Se puede filtrar los detalles por el numero de hoja de ruta
+
+            example:
+                http://localhost:8000/v1/vendedor_detalle_hoja_ruta/?numero=143
+
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        numero=request.GET.get('numero', None)
+        id=request.GET.get('id', None)
+
+        if numero:
+            try:
+                numero=int(numero)
+            except:
+                numero=None
+
+        if id:
+            try:
+                id = int(id)
+            except:
+                id = None
+
+        if numero:
+            queryset=queryset.filter(hoja_ruta__numero=numero)
+
+        if id:
+            queryset=queryset.filter(id=id)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """
+            Recibe un array de objetos detalles y los actualiza
+
+            example body:
+
+                [
+                    {
+                        "id": 1042,
+                        "numero_orden": "01",
+                        "tipo": 1,
+                        "titular": 313227,
+                        "apellido": "MENZIO              ",
+                        "nombre": "HECTOR              ",
+                        "provincia": "CORDOBA",
+                        "localidad": "CORDOBA",
+                        "barrio": "ALBERDI",
+                        "calle": " DEAN FUNES",
+                        "altura": "11",
+                        "piso": "PB",
+                        "departamento": "A ",
+                        "producto": null,
+                        "observacion": {
+                            "id": 1,
+                            "nombre": "No vive más alli"
+                        }
+                    },
+                    {
+                        "id": 1043,
+                        "numero_orden": "02",
+                        "tipo": 1,
+                        "titular": 498472,
+                        "apellido": "IBOS                ",
+                        "nombre": "JOSE RICARDO        ",
+                        "provincia": "CORDOBA",
+                        "localidad": "CORDOBA",
+                        "barrio": "ALBERDI",
+                        "calle": " DEAN FUNES",
+                        "altura": "11",
+                        "piso": "1",
+                        "departamento": "D ",
+                        "producto": null,
+                        "observacion": {
+                            "id": 2,
+                            "nombre": "No tiene tarjeta"
+                        }
+                    }
+                ]
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+
+        serializer = self.get_serializer(data=request.data)
+        list = []
+        hoja_ruta=None
+
+        for detalle_hoja_ruta in serializer.initial_data:
+            detalle_hoja = get_object_or_404(DetalleHojaRuta, id=detalle_hoja_ruta['id'])
+            hoja_ruta = detalle_hoja.hoja_ruta
+            detalle = DetalleHojaRutaSerializer(detalle_hoja, detalle_hoja_ruta)
+            if detalle.is_valid():
+                detalle.save()
+
+        if hoja_ruta:
+            list = hoja_ruta.detalle_hoja_ruta.all()
+
+        serializer = DetalleHojaRutaSerializer(list, many=True)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class HojaRutaRetrieveUpdateAPIView(generics.RetrieveUpdateAPIView):
@@ -248,3 +435,90 @@ class ActualizarHojaRutaCreateAPIView(generics.CreateAPIView):
         serializer=ActualizarHojaRutaSerializer(list, many=True)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class ObservacionViewSet(viewsets.ModelViewSet):
+    """
+    retrieve:
+        Retorna una observacion.
+
+            example:
+              {
+                "id": 1,
+                "nombre": "observacion"
+              }
+
+    list:
+        Retorna el listado de observaciones.
+
+            example:
+
+              [{
+                "id": 1,
+                "nombre": "observacion"
+              },
+              {
+                "id": 2,
+                "nombre": "observacion 2"
+              }]
+
+
+    create:
+        Crea una nueva observacion.
+
+    delete:
+        Elimina la observacion.
+
+    update:
+        Actualiza todos los campos de la observacion.
+
+    partial_update:
+        Actualiza uno o más campos de la observacion.
+
+    """
+    queryset = Observacion.objects.all().order_by('nombre')
+    serializer_class = ObservacionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+class ProductoViewSet(viewsets.ModelViewSet):
+    """
+    retrieve:
+        Retorna un producto.
+
+            example:
+              {
+                "id": 1,
+                "nombre": "producto"
+              }
+
+    list:
+        Retorna el listado de productos.
+
+            example:
+
+              [{
+                "id": 1,
+                "nombre": "producto"
+              },
+              {
+                "id": 2,
+                "nombre": "producto 2"
+              }]
+
+    create:
+        Crea un nuevo producto.
+
+    delete:
+        Elimina un producto.
+
+    update:
+        Actualiza todos los campos del producto.
+
+    partial_update:
+        Actualiza uno o más campos del producto.
+
+    """
+    queryset = Producto.objects.all().order_by('nombre')
+    serializer_class = ProductoSerializer
+    permission_classes = [permissions.IsAuthenticated]

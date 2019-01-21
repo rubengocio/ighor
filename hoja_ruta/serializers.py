@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from contacto.models import ContactoNormalizado
-from hoja_ruta.models import HojaRuta, DetalleHojaRuta, HistorialHojaRuta
+from hoja_ruta.models import HojaRuta, DetalleHojaRuta, HistorialHojaRuta, Observacion, Producto
 from normalizador.enum import ACTIVO
 from normalizador.models.barrio import Barrio
 from normalizador.models.calles_barrio import CallesBarrio
@@ -246,6 +246,96 @@ class HojaRutaSerializer(serializers.ModelSerializer):
         }
 
 
+class DetalleHojaRutaSerializer(serializers.ModelSerializer):
+    provincia=serializers.SerializerMethodField()
+    localidad=serializers.SerializerMethodField()
+    barrio=serializers.SerializerMethodField()
+    calle=serializers.SerializerMethodField()
+    producto=serializers.SerializerMethodField()
+    observacion=serializers.SerializerMethodField()
+
+    class Meta:
+        model=DetalleHojaRuta
+        fields=(
+            'id',
+            'numero_orden',
+            'tipo',
+            'titular',
+            'apellido',
+            'nombre',
+            'provincia',
+            'localidad',
+            'barrio',
+            'calle',
+            'altura',
+            'piso',
+            'departamento',
+            'producto',
+            'observacion'
+
+        )
+
+    def get_provincia(self, obj):
+        return obj.provincia.nombre
+
+    def get_localidad(self, obj):
+        return obj.localidad.nombre
+
+    def get_barrio(self, obj):
+        return obj.barrio.nombre
+
+    def get_calle(self, obj):
+        return obj.calle.nombre
+
+    def get_producto(self, obj):
+
+        if obj.producto:
+            return {
+                'id': obj.producto.id,
+                'nombre': obj.producto.nombre
+            }
+        else:
+            return None
+
+    def get_observacion(self, obj):
+
+        if obj.observacion:
+            return {
+                'id': obj.observacion.id,
+                'nombre': obj.observacion.nombre
+            }
+        else:
+            return None
+
+    def update(self, instance, validated_data):
+        try:
+            observacion_id = self.initial_data['observacion']['id']
+
+            if observacion_id:
+                observacion=get_object_or_404(Observacion, id=observacion_id)
+
+        except Exception:
+            observacion=None
+
+        try:
+            producto_id = self.initial_data['producto']['id']
+
+            if producto_id:
+                producto = get_object_or_404(Producto, id=producto_id)
+
+        except Exception:
+            producto=None
+
+        if observacion:
+            instance.observacion=observacion
+
+        if producto:
+            instance.producto=producto
+
+        instance.save()
+        return instance
+
+
 class ActualizarHojaRutaSerializer(serializers.ModelSerializer):
     calle = serializers.SerializerMethodField()
     asignada_a=serializers.SerializerMethodField()
@@ -298,3 +388,21 @@ class ActualizarHojaRutaSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class ObservacionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=Observacion
+        fields=(
+            'id',
+            'nombre',
+        )
+
+
+class ProductoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producto
+        fields = (
+            'id',
+            'nombre',
+        )
