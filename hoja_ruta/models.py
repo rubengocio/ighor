@@ -4,7 +4,11 @@ from django.db import models
 
 
 # Create your models here.
+from django.db.models import OuterRef
+from django.db.models import Subquery
+
 from contacto.models import ContactoNormalizado
+from contacto.models.cliente_jk import ClienteJK
 from normalizador.models.barrio import Barrio
 from normalizador.models.calles_barrio import CallesBarrio
 
@@ -107,7 +111,6 @@ class HojaRuta(models.Model):
             self.estado = HojaRuta.CON_DEVOLUCION
             self.save()
 
-
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
@@ -147,67 +150,105 @@ class DetalleHojaRuta(models.Model):
     producto=models.ForeignKey(Producto, null=True, blank=True)
     is_completa=models.BooleanField(default=False)
 
-    contact=None
+    contact = None
+    cliente_jk=None
+
     def __str__(self):
         return u'%s' % self.id
 
     def __unicode__(self):
         return u'%s' % self.id
 
+
     @property
     def apellido(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.apellido
 
     @property
     def nombre(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.nombre
 
     @property
     def provincia(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.provincia
 
     @property
     def localidad(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.localidad
 
     @property
     def barrio(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.barrio
 
     @property
     def calle(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.calle
 
     @property
     def altura(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.altura
 
     @property
     def piso(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.piso
 
     @property
     def departamento(self):
         if self.contact is None:
-            self.contact=ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
+            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
         return self.contact.departamento
 
+    @property
+    def telefono(self):
+        if self.cliente_jk is None:
+            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
+        return self.cliente_jk.telefono
+
+    @property
+    def deuda(self):
+        if self.cliente_jk is None:
+            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
+        return 'Si' if len(self.cliente_jk.monto_deuda) > 0 else 'No'
+
+    @property
+    def productos(self):
+        if self.cliente_jk is None:
+            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
+        return self.cliente_jk.productos if self.cliente_jk.productos != 'NULL' else ''
+
+    @property
+    def inhumados(self):
+        if self.cliente_jk is None:
+            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
+        return self.cliente_jk.inhumados if self.cliente_jk.inhumados != 'NULL' else 'No'
+
+    @property
+    def activos(self):
+        if self.cliente_jk is None:
+            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
+        return True
+
+    @property
+    def observaciones(self):
+        detalle=DetalleHojaRuta.objects.filter(tipo=self.tipo, titular=self.titular, observacion__isnull=False).last()
+
+        return  detalle.observacion.nombre if detalle else ''
 
     def save(self, *args, **kwargs):
 

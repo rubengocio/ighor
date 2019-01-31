@@ -9,7 +9,30 @@
             margin: 1cm;
         }
 
-         .list-group {
+         .table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 5px;
+            background-color: #fff;
+        }
+        .table th,
+        .table td {
+            padding: 5px;
+            vertical-align: top;
+            border-top: 1px solid #000;
+            text-align: center;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #000;
+        }
+        .table tbody + tbody {
+            border-top: 2px solid #000;
+        }
+        .table .table {
+            background-color: #fff;
+        }
+        .list-group {
             display: block;
             width: 100%;
             list-style: none;
@@ -18,25 +41,12 @@
         }
         .list-group p {
             width: 100%;
-            height: 15px;
-            line-height: 15px;
+            height: 20px;
+            line-height: 20px;
             list-style: none;
-            font-size: 1.0em;
+            font-size: 1.1em;
         }
 
-        .table {
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 1px;
-            background-color: #fff;
-        }
-        .table th,
-        .table td {
-            padding: 2px;
-            vertical-align: top;
-            border-top: 1px solid #000;
-            font-size: 1.0em;
-        }
     </style>
 
 </head>
@@ -63,39 +73,39 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th align="left" width="7%">ORDEN</th>
-                            <th align="left" width="35%">DESTINATARIO</th>
-                            <th align="left">DOMICILIO</th>
-                            <th align="left" width="5%">NRO</th>
-                            <th align="left" width="5%">PISO</th>
+                            <th align="left" width="6%">ORDEN</th>
+                            <th align="left" width="20%">DESTINATARIO</th>
+                            <th align="left" width="10%">DOMICILIO</th>
+                            <th align="left" width="6%">NRO</th>
+                            <th align="left" width="6%">PISO</th>
                             <th align="left" width="5%">DEPTO</th>
                             <th align="left" width="5%">TIPO</th>
-                            <th align="left">DOCUMENTO</th>
-                            <th align="left">TELEFONO</th>
-                            <th align="left">DEUDA</th>
-                            <th align="left">PRODUCTOS</th>
-                            <th align="left">INHUM.</th>
-                            <th align="left">ACTIVO</th>
-                            <th align="left">OBSERVACIONES</th>
+                            <th align="left" width="6%">DOCUMENTO</th>
+                            <th align="left" width="6%">TELEFONO</th>
+                            <th align="left" width="6%">DEUDA</th>
+                            <th align="left" width="6%">PRODUCTOS</th>
+                            <th align="left" width="6%">INHUM.</th>
+                            <th align="left" width="6%">ACTIVO</th>
+                            <th align="left" width="6%">OBSERVACIONES</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for detalle in hoja_ruta.detalles %}
                         <tr style="height: 38px;">
                             <td >{{ detalle.numero_orden }}</td>
-                            <td width="35%">{{ detalle.apellido }}, {{ detalle.nombre }}</td>
+                            <td>{{ detalle.apellido }}, {{ detalle.nombre }}</td>
                             <td>{{ detalle.calle }}</td>
                             <td>{{ detalle.altura }}</td>
                             <td>{{ detalle.piso }}</td>
                             <td>{{ detalle.departamento }}</td>
                             <td>{{ detalle.tipo }}</td>
                             <td>{{ detalle.titular }}</td>
-                            <td> </td>
-                            <td> </td>
-                            <td> </td>
-                            <td> </td>
-                            <td> </td>
-                            <td> </td>
+                            <td>{{ detalle.telefono }}</td>
+                            <td>{{ detalle.deuda }}</td>
+                            <td>{{ detalle.productos }}</td>
+                            <td>{{ detalle.inhumados }}</td>
+                            <td>{{ detalle.activos }}</td>
+                            <td>{{ detalle.observaciones }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>
