@@ -163,92 +163,91 @@ class DetalleHojaRuta(models.Model):
     @property
     def apellido(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.apellido
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.apellido if self.contact else ''
 
     @property
     def nombre(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.nombre
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.nombre if self.contact else ''
 
     @property
     def provincia(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.provincia
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.provincia if self.contact else ''
 
     @property
     def localidad(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.localidad
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.localidad if self.contact else ''
 
     @property
     def barrio(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.barrio
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.barrio if self.contact else ''
 
     @property
     def calle(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.calle
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.calle if self.contact else ''
 
     @property
     def altura(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.altura
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.altura if self.contact else ''
 
     @property
     def piso(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.piso
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.piso if self.contact else ''
 
     @property
     def departamento(self):
         if self.contact is None:
-            self.contact = ContactoNormalizado.objects.get(tipo=self.tipo, titular=self.titular)
-        return self.contact.departamento
+            self.contact = ContactoNormalizado.objects.filter(tipo=self.tipo, titular=self.titular).first()
+        return self.contact.departamento if self.contact else ''
 
     @property
     def telefono(self):
         if self.cliente_jk is None:
-            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
-        return self.cliente_jk.telefono
+            self.cliente_jk = ClienteJK.objects.filter(tipo_documento=self.tipo, nro_documento=self.titular).first()
+        return (self.cliente_jk.telefono if self.cliente_jk.telefono == '0' else '') if self.cliente_jk else ''
 
     @property
     def deuda(self):
         if self.cliente_jk is None:
-            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
-        return 'Si' if len(self.cliente_jk.monto_deuda) > 0 else 'No'
+            self.cliente_jk = ClienteJK.objects.filter(tipo_documento=self.tipo, nro_documento=self.titular).first()
+        return ('Si' if len(self.cliente_jk.monto_deuda) > 0 else 'No') if self.cliente_jk else ''
 
     @property
     def productos(self):
         if self.cliente_jk is None:
-            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
-        return self.cliente_jk.productos if self.cliente_jk.productos != 'NULL' else ''
+            self.cliente_jk = ClienteJK.objects.filter(tipo_documento=self.tipo, nro_documento=self.titular).first()
+        return (self.cliente_jk.productos if self.cliente_jk.productos != 'NULL' else '') if self.cliente_jk else ''
 
     @property
     def inhumados(self):
         if self.cliente_jk is None:
-            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
-        return self.cliente_jk.inhumados if self.cliente_jk.inhumados != 'NULL' else 'No'
+            self.cliente_jk = ClienteJK.objects.filter(tipo_documento=self.tipo, nro_documento=self.titular).first()
+        return (self.cliente_jk.inhumados if self.cliente_jk.inhumados != 'NULL' else 'No') if self.cliente_jk else ''
 
     @property
     def activos(self):
         if self.cliente_jk is None:
-            self.cliente_jk = ClienteJK.objects.get(tipo_documento=self.tipo, nro_documento=self.titular)
-        return True
+            self.cliente_jk = ClienteJK.objects.filter(tipo_documento=self.tipo, nro_documento=self.titular).first()
+        return 'Si'
 
     @property
     def observaciones(self):
         detalle=DetalleHojaRuta.objects.filter(tipo=self.tipo, titular=self.titular, observacion__isnull=False).last()
-
-        return  detalle.observacion.nombre if detalle else ''
+        return detalle.observacion.nombre if detalle else ''
 
     def save(self, *args, **kwargs):
 
