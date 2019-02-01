@@ -43,49 +43,47 @@ class GeneradorHojaRutaSerializer(serializers.ModelSerializer):
                 {'altura_int': "CAST(altura as UNSIGNED)"}
             ).order_by('altura_int')
 
-            if len(contactos) == 0:
-                break
+            if len(contactos) > 0:
+                paginator = Paginator(contactos, cant_filas)
 
-            paginator = Paginator(contactos, cant_filas)
+                for page in range(1, paginator.num_pages + 1):
+                    hoja_ruta=HojaRuta()
+                    hoja_ruta.calle_barrio=calle_barrio
+                    hoja_ruta.numero=HojaRuta.nextNumber()
+                    hoja_ruta.historial=historial
+                    hoja_ruta.save()
 
-            for page in range(1, paginator.num_pages + 1):
-                hoja_ruta=HojaRuta()
-                hoja_ruta.calle_barrio=calle_barrio
-                hoja_ruta.numero=HojaRuta.nextNumber()
-                hoja_ruta.historial=historial
-                hoja_ruta.save()
+                    altura_desde=0
+                    altura_hasta=0
+                    cant_registros=0
+                    first=True
 
-                altura_desde=0
-                altura_hasta=0
-                cant_registros=0
-                first=True
+                    cont=1
+                    for contacto in paginator.page(page).object_list:
+                        detalle=DetalleHojaRuta()
+                        detalle.hoja_ruta=hoja_ruta
+                        str_cont=str(cont)
+                        detalle.numero_orden=str_cont if len(str_cont) > 1 else '0' + str_cont
+                        detalle.tipo=contacto.tipo
+                        detalle.titular=contacto.titular
+                        detalle.save()
 
-                cont=1
-                for contacto in paginator.page(page).object_list:
-                    detalle=DetalleHojaRuta()
-                    detalle.hoja_ruta=hoja_ruta
-                    str_cont=str(cont)
-                    detalle.numero_orden=str_cont if len(str_cont) > 1 else '0' + str_cont
-                    detalle.tipo=contacto.tipo
-                    detalle.titular=contacto.titular
-                    detalle.save()
-
-                    if first is True:
-                        altura_desde=contacto.altura
-                        altura_hasta=contacto.altura
-                        first=False
-                    else:
-                        if contacto.altura > altura_hasta:
-                            altura_hasta=contacto.altura
-
-                        if contacto.altura < altura_desde:
+                        if first is True:
                             altura_desde=contacto.altura
-                    cant_registros=cont
-                    cont += 1
-                hoja_ruta.cant_registros=cant_registros
-                hoja_ruta.altura_desde=altura_desde
-                hoja_ruta.altura_hasta=altura_hasta
-                hoja_ruta.save()
+                            altura_hasta=contacto.altura
+                            first=False
+                        else:
+                            if contacto.altura > altura_hasta:
+                                altura_hasta=contacto.altura
+
+                            if contacto.altura < altura_desde:
+                                altura_desde=contacto.altura
+                        cant_registros=cont
+                        cont += 1
+                    hoja_ruta.cant_registros=cant_registros
+                    hoja_ruta.altura_desde=altura_desde
+                    hoja_ruta.altura_hasta=altura_hasta
+                    hoja_ruta.save()
         return instance
 
 

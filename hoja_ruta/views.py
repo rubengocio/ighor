@@ -357,6 +357,7 @@ class Pdf(generics.ListAPIView):
         }
         return Render.render('pdf.html', params)
 
+
 class ActualizarHojaRutaCreateAPIView(generics.CreateAPIView):
     """
     Recibe un arreglo de hojas de ruta y actualiza cada una de ellas.
