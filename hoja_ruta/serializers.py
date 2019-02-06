@@ -287,11 +287,16 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
 
     def get_producto(self, obj):
 
-        if obj.producto:
-            return {
-                'id': obj.producto.id,
-                'nombre': obj.producto.nombre
-            }
+        if obj.producto.all().count() > 0:
+            resutl = []
+
+            for prodcut in obj.producto.all():
+                resutl.append({
+                    'id': prodcut.id,
+                    'nombre': prodcut.nombre
+                })
+
+            return resutl
         else:
             return None
 
@@ -316,19 +321,30 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
             observacion=None
 
         try:
-            producto_id = self.initial_data['producto']['id']
+            producto_ids = self.initial_data['producto']
 
-            if producto_id:
-                producto = get_object_or_404(Producto, id=producto_id)
+            list = []
+            for ids in producto_ids:
+                try:
+                    id = ids['id']
+                    producto= Producto.objects.get(id=id)
+                    list.append(producto)
+                except Exception:
+                    pass
 
         except Exception:
             producto=None
 
+        instance.observacion = None
+
         if observacion:
             instance.observacion=observacion
 
-        if producto:
-            instance.producto=producto
+        instance.producto = []
+
+        if list:
+            for produc in list:
+                instance.producto.add(produc)
 
         instance.save()
         return instance

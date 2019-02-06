@@ -189,8 +189,8 @@ class DetalleHojaRutaVendedorListCreateAPIView(generics.ListCreateAPIView):
                         "numero_orden": "01",
                         "tipo": 1,
                         "titular": 313227,
-                        "apellido": "MENZIO              ",
-                        "nombre": "HECTOR              ",
+                        "apellido": "MENZIO",
+                        "nombre": "HECTOR",
                         "provincia": "CORDOBA",
                         "localidad": "CORDOBA",
                         "barrio": "ALBERDI",
@@ -198,7 +198,14 @@ class DetalleHojaRutaVendedorListCreateAPIView(generics.ListCreateAPIView):
                         "altura": "11",
                         "piso": "PB",
                         "departamento": "A ",
-                        "producto": null,
+                        "producto": [
+                            {
+                                "id": 3
+                            },
+                            {
+                                "id": 4
+                            }
+                        ],
                         "observacion": {
                             "id": 1,
                             "nombre": "No vive más alli"
@@ -209,15 +216,15 @@ class DetalleHojaRutaVendedorListCreateAPIView(generics.ListCreateAPIView):
                         "numero_orden": "02",
                         "tipo": 1,
                         "titular": 498472,
-                        "apellido": "IBOS                ",
-                        "nombre": "JOSE RICARDO        ",
+                        "apellido": "IBOS",
+                        "nombre": "JOSE RICARDO",
                         "provincia": "CORDOBA",
                         "localidad": "CORDOBA",
                         "barrio": "ALBERDI",
                         "calle": " DEAN FUNES",
                         "altura": "11",
                         "piso": "1",
-                        "departamento": "D ",
+                        "departamento": "D",
                         "producto": null,
                         "observacion": {
                             "id": 2,

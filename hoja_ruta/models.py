@@ -147,7 +147,7 @@ class DetalleHojaRuta(models.Model):
     tipo = models.IntegerField(blank=True, null=True, default=0)
     titular = models.IntegerField(blank=True, null=True, default=0)
     observacion=models.ForeignKey(Observacion, null=True, blank=True)
-    producto=models.ForeignKey(Producto, null=True, blank=True)
+    producto=models.ManyToManyField(Producto, null=True, blank=True)
     is_completa=models.BooleanField(default=False)
 
     contact = None
