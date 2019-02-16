@@ -21,6 +21,7 @@ class Command(BaseCommand):
             NAME = default.get('NAME')
             USER = default.get('USER')
             PASSWORD = default.get('PASSWORD')
+            HOST = default.get('HOST')
             BACKUP_DIR = settings.BASE_DIR + '/backup'
 
             datetime = time.strftime('%m%d%Y-%H%M%S')
@@ -30,7 +31,7 @@ class Command(BaseCommand):
             if not os.path.exists(datetimeBackupDir):
                 os.makedirs(datetimeBackupDir)
 
-            mysqldump_cmd = "mysqldump -u " + USER + " --password='" + PASSWORD + "' -h mysql.server --databases '" + NAME + "' > " + datetimeBackupDir + "/" + NAME + ".sql"
+            mysqldump_cmd = "mysqldump -u " + USER + " --password='" + PASSWORD + "' -h " + HOST + " --databases '" + NAME + "' > " + datetimeBackupDir + "/" + NAME + ".sql"
             os.system(mysqldump_cmd)
             self.stdout.write(u"fin dump..")
 
