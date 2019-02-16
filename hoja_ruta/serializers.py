@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from contacto.models import ContactoNormalizado
-from hoja_ruta.models import HojaRuta, DetalleHojaRuta, HistorialHojaRuta, Observacion, Producto
+from hoja_ruta.models import HojaRuta, DetalleHojaRuta, HistorialHojaRuta, Observacion, Producto, \
+    ProductosDetalleHojaRuta
 from normalizador.enum import ACTIVO
 from normalizador.models.barrio import Barrio
 from normalizador.models.calles_barrio import CallesBarrio
@@ -23,19 +24,19 @@ class GeneradorHojaRutaSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
-        cant_filas=15
+        cant_filas = 15
         barrio = instance
-        calles_barrio=CallesBarrio.objects.filter(
+        calles_barrio = CallesBarrio.objects.filter(
             barrio=barrio
         ).order_by('calle__nombre')
 
-        historial=HistorialHojaRuta()
-        historial.owner=self.context['request'].user
-        historial.barrio=barrio
+        historial = HistorialHojaRuta()
+        historial.owner = self.context['request'].user
+        historial.barrio = barrio
         historial.save()
 
         for calle_barrio in calles_barrio:
-            contactos=ContactoNormalizado.objects.filter(
+            contactos = ContactoNormalizado.objects.filter(
                 barrio=calle_barrio.barrio,
                 calle=calle_barrio.calle,
                 estado=ACTIVO
@@ -47,45 +48,45 @@ class GeneradorHojaRutaSerializer(serializers.ModelSerializer):
                 paginator = Paginator(contactos, cant_filas)
 
                 for page in range(1, paginator.num_pages + 1):
-                    hoja_ruta=HojaRuta()
-                    hoja_ruta.calle_barrio=calle_barrio
-                    hoja_ruta.numero=HojaRuta.nextNumber()
-                    hoja_ruta.historial=historial
+                    hoja_ruta = HojaRuta()
+                    hoja_ruta.calle_barrio = calle_barrio
+                    hoja_ruta.numero = HojaRuta.nextNumber()
+                    hoja_ruta.historial = historial
                     hoja_ruta.save()
 
-                    altura_desde=0
-                    altura_hasta=0
-                    cant_registros=0
-                    first=True
+                    altura_desde = 0
+                    altura_hasta = 0
+                    cant_registros = 0
+                    first = True
 
-                    cont=1
+                    cont = 1
                     for contacto in paginator.page(page).object_list:
-                        detalle=DetalleHojaRuta()
-                        detalle.hoja_ruta=hoja_ruta
-                        str_cont=str(cont)
-                        detalle.numero_orden=str_cont if len(str_cont) > 1 else '0' + str_cont
-                        detalle.tipo=contacto.tipo
-                        detalle.titular=contacto.titular
+                        detalle = DetalleHojaRuta()
+                        detalle.hoja_ruta = hoja_ruta
+                        str_cont = str(cont)
+                        detalle.numero_orden = str_cont if len(str_cont) > 1 else '0' + str_cont
+                        detalle.tipo = contacto.tipo
+                        detalle.titular = contacto.titular
                         detalle.save()
 
                         if first is True:
-                            altura_desde=contacto.altura
-                            altura_hasta=contacto.altura
+                            altura_desde = contacto.altura
+                            altura_hasta = contacto.altura
                             first=False
                         else:
                             if contacto.altura > altura_hasta:
-                                altura_hasta=contacto.altura
+                                altura_hasta = contacto.altura
 
                             if contacto.altura < altura_desde:
-                                altura_desde=contacto.altura
+                                altura_desde = contacto.altura
                         cant_registros=cont
                         cont += 1
-                    hoja_ruta.cant_registros=cant_registros
-                    hoja_ruta.altura_desde=altura_desde
-                    hoja_ruta.altura_hasta=altura_hasta
+                        detalle.save()
+                    hoja_ruta.cant_registros = cant_registros
+                    hoja_ruta.altura_desde = altura_desde
+                    hoja_ruta.altura_hasta = altura_hasta
                     hoja_ruta.save()
         return instance
-
 
     def get_historial(self, obj):
         historial = HistorialHojaRuta.objects.filter(
@@ -287,10 +288,12 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
 
     def get_producto(self, obj):
 
-        if obj.producto.all().count() > 0:
+        if obj.detalle_productos.all().count() > 0:
             resutl = []
 
-            for prodcut in obj.producto.all():
+            detalle_productos = obj.detalle_productos.first()
+
+            for prodcut in detalle_productos.producto.all():
                 resutl.append({
                     'id': prodcut.id,
                     'nombre': prodcut.nombre
@@ -340,11 +343,15 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
         if observacion:
             instance.observacion=observacion
 
-        instance.producto = []
-
         if list:
+            ProductosDetalleHojaRuta.objects.filter(detalle=instance).delete()
+            productos=ProductosDetalleHojaRuta.objects.create(
+                detalle=instance,
+            )
+            productos.producto.set(list)
             for produc in list:
-                instance.producto.add(produc)
+                productos.producto.add(produc)
+            producto.save()
 
         instance.save()
         return instance

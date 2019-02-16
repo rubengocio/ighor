@@ -6,7 +6,7 @@ from hoja_ruta.models import HojaRuta, DetalleHojaRuta, Observacion, Producto
 
 
 class DetalleHojaRutaInline(admin.TabularInline):
-    contact=None
+    contact = None
     model = DetalleHojaRuta
     readonly_fields = (
         'numero_orden',
@@ -22,8 +22,7 @@ class DetalleHojaRutaInline(admin.TabularInline):
         'piso',
         'departamento',
         'observacion',
-        'producto'
-    )
+   )
     exclude = ('id', 'is_completa')
 
     def apellido(self, obj):

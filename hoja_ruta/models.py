@@ -142,16 +142,15 @@ class Producto(models.Model):
 
 
 class DetalleHojaRuta(models.Model):
-    hoja_ruta=models.ForeignKey(HojaRuta, related_name='detalle_hoja_ruta')
-    numero_orden=models.CharField(max_length=2)
+    hoja_ruta = models.ForeignKey(HojaRuta, related_name='detalle_hoja_ruta')
+    numero_orden = models.CharField(max_length=2)
     tipo = models.IntegerField(blank=True, null=True, default=0)
     titular = models.IntegerField(blank=True, null=True, default=0)
-    observacion=models.ForeignKey(Observacion, null=True, blank=True)
-    producto=models.ManyToManyField(Producto, null=True, blank=True)
-    is_completa=models.BooleanField(default=False)
+    observacion = models.ForeignKey(Observacion, null=True, blank=True)
+    is_completa = models.BooleanField(default=False)
 
     contact = None
-    cliente_jk=None
+    cliente_jk = None
 
     def __str__(self):
         return u'%s' % self.id
@@ -251,8 +250,13 @@ class DetalleHojaRuta(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.is_completa = True if self.observacion or self.producto else False
+        self.is_completa = True if self.observacion or self.productos.count() > 0 else False
 
         super(DetalleHojaRuta, self).save(*args, **kwargs)
 
         self.hoja_ruta.update_status()
+
+
+class ProductosDetalleHojaRuta(models.Model):
+    detalle = models.ForeignKey(DetalleHojaRuta, related_name='detalle_productos')
+    producto = models.ManyToManyField(Producto, blank=True)
