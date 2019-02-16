@@ -250,7 +250,7 @@ class DetalleHojaRuta(models.Model):
 
     def save(self, *args, **kwargs):
 
-        self.is_completa = True if self.observacion or self.productos.count() > 0 else False
+        self.is_completa = True if self.observacion or self.detalle_productos.count() > 0 else False
 
         super(DetalleHojaRuta, self).save(*args, **kwargs)
 
