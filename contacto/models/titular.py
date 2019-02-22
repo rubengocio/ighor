@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.db import models, connection
 
+from contacto import commons
+
 
 class Titular(models.Model):
     estado = models.CharField(max_length=5, blank=True, null=True, default=None)
-    tipo = models.IntegerField(blank=True, null=True, default=0, db_index=True)
+    tipo = models.IntegerField(blank=True, null=True, default=commons.DNI, db_index=True, choices=commons.TIPO_DOCUMENTO_CHOICES)
     descripcion = models.CharField(max_length=255, blank=True, null=True, default=None)
     titular = models.IntegerField(blank=True, null=True, default=0, db_index=True)
     apellido = models.CharField(max_length=255, blank=True, null=True, default=None)
@@ -44,6 +46,8 @@ class Titular(models.Model):
             query += '  domicilio_calle=trim(domicilio_calle), '
             query += '  provincia=trim(provincia), '
             query += '  localidad=trim(localidad) '
+            query += '  nombre=trim(nombre) '
+            query += '  apellido=trim(apellido) '
 
             cursor = connection.cursor()
             cursor.execute(query)
@@ -52,3 +56,8 @@ class Titular(models.Model):
             return False
         return True
 
+    def __str__(self):
+        return u'%s - %s' % (str(self.tipo), str(self.titular))
+
+    def __unicode__(self):
+        return u'%s - %s' % (str(self.tipo), str(self.titular))

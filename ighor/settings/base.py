@@ -164,3 +164,5 @@ CORS_ALLOW_METHODS = (
 # Create a Redis instance using redislite
 CELERY_BROKER_URL = 'redis://localhost'
 X_FRAME_OPTIONS = 'ALLOWALL'
+
+IMPORT_EXPORT_SKIP_ADMIN_LOG = True

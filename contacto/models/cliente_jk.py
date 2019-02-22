@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from contacto import commons
+
 
 class ClienteJK(models.Model):
     cod_cliente = models.CharField(max_length=255, blank=True, null=True, default=None)
     nombre = models.CharField(max_length=255, blank=True, null=True, default=None, db_index=True)
-    tipo_documento = models.IntegerField(blank=True, null=True, default=None, db_index=True)
+    tipo_documento = models.IntegerField(blank=True, null=True, default=commons.DNI, db_index=True,
+                                         choices=commons.TIPO_DOCUMENTO_CHOICES)
     nro_documento = models.IntegerField(blank=True, null=True, default=None, db_index=True)
     telefono = models.CharField(max_length=255, blank=True, null=True, default=None)
     calle = models.CharField(max_length=255, blank=True, null=True, default=None)

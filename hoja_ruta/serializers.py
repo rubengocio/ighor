@@ -69,16 +69,24 @@ class GeneradorHojaRutaSerializer(serializers.ModelSerializer):
                         detalle.titular = contacto.titular
                         detalle.save()
 
-                        if first is True:
-                            altura_desde = contacto.altura
-                            altura_hasta = contacto.altura
-                            first=False
-                        else:
-                            if contacto.altura > altura_hasta:
-                                altura_hasta = contacto.altura
+                        contacto_altura = None
 
-                            if contacto.altura < altura_desde:
-                                altura_desde = contacto.altura
+                        try:
+                            contacto_altura = int(contacto.altura)
+                        except Exception:
+                            pass
+
+                        if first is True:
+                            altura_desde = contacto_altura
+                            altura_hasta = contacto_altura
+                            first = False
+                        else:
+                            if contacto_altura > altura_hasta:
+                                altura_hasta = contacto_altura
+
+                            if contacto_altura < altura_desde:
+                                altura_desde = contacto_altura
+
                         cant_registros=cont
                         cont += 1
                         detalle.save()

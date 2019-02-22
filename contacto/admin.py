@@ -1,17 +1,66 @@
 from django.contrib import admin
 
 # Register your models here.
+from django.db import IntegrityError
+
 from django.dispatch import receiver
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.fields import Field
 from import_export.signals import post_import
+from import_export.widgets import NumberWidget, Widget
 
+from contacto import commons
 from contacto.models import ContactoNormalizado
 from contacto.models.cliente_jk import ClienteJK
 from contacto.models.titular import Titular
 from contacto.tasks import quitar_espacios, actualizar_provincia, actualizar_localidad
 from normalizador.tasks import actualizar_diccionario_barrio, actualizar_contacto
+
+
+class ClienteJKResource(resources.ModelResource):
+    cod_cliente = Field(attribute='cod_cliente', column_name='COD_CLIENTE')
+    nombre = Field(attribute='nombre', column_name='NOMBRE')
+    tipo_documento = Field(attribute='tipo_documento', column_name='TIPO_DOCUMENTO')
+    nro_documento = Field(attribute='nro_documento', column_name='NRO_DOCUMENTO')
+    telefono = Field(attribute='telefono', column_name='TELEFONO')
+    calle = Field(attribute='calle', column_name='CALLE')
+    numero = Field(attribute='numero', column_name='NRO')
+    barrio = Field(attribute='barrio', column_name='BARRIO')
+    codigo_postal = Field(attribute='codigo_postal', column_name='CODIGO_POSTAL')
+    cuadrante = Field(attribute='cuadrante', column_name='CUADRANTE')
+    cualidad = Field(attribute='cualidad', column_name='Cualidad')
+    inhumados = Field(attribute='inhumados', column_name='Inhumados')
+    productos = Field(attribute='productos', column_name='Productos')
+    meses_deuda = Field(attribute='meses_deuda', column_name='MesesDeuda')
+    monto_deuda = Field(attribute='monto_deuda', column_name='MontoDeuda')
+    tel_naranja = Field(attribute='tel_naranja', column_name='TelNaranja')
+    tel_jakemate_1 = Field(attribute='tel_jakemate_1', column_name='TelJakeMate1')
+    tel_jakemate_2 = Field(attribute='tel_jakemate_2', column_name='TelJakeMate2')
+    tel_jakemate_3 = Field(attribute='tel_jakemate_3', column_name='TelJakeMate3')
+    ultimo_pago = Field(attribute='ultimo_pago', column_name='UltimoPago')
+
+    class Meta:
+        model = ClienteJK
+        exclude = ('id',)
+        import_id_fields = ('tipo_documento','nro_documento')
+
+    def before_import_row(self, row, **kwargs):
+        name = self.__class__
+        try:
+            try:
+                row['TIPO_DOCUMENTO'] = commons.get_tipo_documento(row['TIPO_DOCUMENTO'])
+            except Exception as ex:
+                row['TIPO_DOCUMENTO'] = 0
+
+            super(name, self).before_import_row(row, **kwargs)
+        except IntegrityError:
+            pass
+
+
+class ClienteJKAdmin(ImportExportModelAdmin):
+    resource_class = ClienteJKResource
+    list_display = ('nombre', 'tipo_documento', 'nro_documento')
 
 
 class TitularResource(resources.ModelResource):
@@ -51,45 +100,30 @@ class TitularResource(resources.ModelResource):
     class Meta:
         model = Titular
         exclude = ('id',)
-        import_id_fields = ('tipo','titular')
+        import_id_fields = ('tipo', 'titular')
+
+    def save_instance(self, instance, using_transactions=True, dry_run=False):
+        name = self.__class__
+        try:
+            try:
+                instance.fecha_alta = str(int(instance.fecha_alta.replace('/', '')))
+            except Exception as ex:
+                instance.fecha_alta = 0
+
+            try:
+                instance.fecha_nacimiento = str(int(instance.fecha_nacimiento.replace('/', '')))
+            except Exception as ex:
+                instance.fecha_nacimiento = 0
+
+            print(instance)
+            super(name, self).save_instance(instance, using_transactions, dry_run)
+        except IntegrityError:
+            pass
 
 
 class TitularAdmin(ImportExportModelAdmin):
     resource_class = TitularResource
     list_display = ('titular','descripcion','apellido','nombre')
-
-
-class ClienteJKResource(resources.ModelResource):
-    cod_cliente = Field(attribute='cod_cliente', column_name='COD_CLIENTE')
-    nombre = Field(attribute='nombre', column_name='NOMBRE')
-    tipo_documento = Field(attribute='tipo_documento', column_name='TIPO_DOCUMENTO')
-    nro_documento = Field(attribute='nro_documento', column_name='NRO_DOCUMENTO')
-    telefono = Field(attribute='telefono', column_name='TELEFONO')
-    calle = Field(attribute='calle', column_name='CALLE')
-    numero = Field(attribute='numero', column_name='NRO')
-    barrio = Field(attribute='barrio', column_name='BARRIO')
-    codigo_postal = Field(attribute='codigo_postal', column_name='CODIGO_POSTAL')
-    cuadrante = Field(attribute='cuadrante', column_name='CUADRANTE')
-    cualidad = Field(attribute='cualidad', column_name='Cualidad')
-    inhumados = Field(attribute='inhumados', column_name='Inhumados')
-    productos = Field(attribute='productos', column_name='Productos')
-    meses_deuda = Field(attribute='meses_deuda', column_name='MesesDeuda')
-    monto_deuda = Field(attribute='monto_deuda', column_name='MontoDeuda')
-    tel_naranja = Field(attribute='tel_naranja', column_name='TelNaranja')
-    tel_jakemate_1 = Field(attribute='tel_jakemate_1', column_name='TelJakeMate1')
-    tel_jakemate_2 = Field(attribute='tel_jakemate_2', column_name='TelJakeMate2')
-    tel_jakemate_3 = Field(attribute='tel_jakemate_3', column_name='TelJakeMate3')
-    ultimo_pago = Field(attribute='ultimo_pago', column_name='UltimoPago')
-
-    class Meta:
-        model = ClienteJK
-        exclude = ('id',)
-        import_id_fields = ('tipo_documento','nro_documento')
-
-
-class ClienteJKAdmin(ImportExportModelAdmin):
-    resource_class = ClienteJKResource
-    list_display = ('nombre','tipo_documento','nro_documento')
 
 
 class IsBarrioNormalizadoFilter(admin.SimpleListFilter):

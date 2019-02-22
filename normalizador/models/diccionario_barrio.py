@@ -5,8 +5,8 @@ from normalizador.models.barrio import Barrio
 
 
 class DiccionarioBarrio(models.Model):
-    nombre=models.CharField(max_length=127, db_index=True)
-    barrio=models.ForeignKey(Barrio, blank=True, null=True)
+    nombre = models.CharField(max_length=127, db_index=True)
+    barrio = models.ForeignKey(Barrio, blank=True, null=True)
 
     @staticmethod
     def actualizar_diccionario_barrio():
