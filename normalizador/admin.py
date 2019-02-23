@@ -72,8 +72,8 @@ class CallesBarrioResource(resources.ModelResource):
 
                 nomenclado = '1' if nomenclado == 'True' else '0'
 
-                barrio = Barrio.objects.filter(nombre=barrio).first()
-                calle = Calle.objects.filter(nombre=calle).first()
+                barrio = Barrio.objects.filter(id=barrio).first()
+                calle = Calle.objects.filter(id=calle).first()
 
                 try:
                     tipo_numeracion = int(tipo_numeracion)
