@@ -3,7 +3,13 @@ from django.db import models, connection
 
 
 class CalleIncorrecta(models.Model):
-    nombre=models.CharField(max_length=127, db_index=True)
+    nombre = models.CharField(max_length=127, db_index=True)
+
+    def __str__(self):
+        return u'%s' % self.nombre
+
+    def __unicode__(self):
+        return u'%s' % self.nombre
 
     @staticmethod
     def actualizar_calle_incorrecta(barrio_id):

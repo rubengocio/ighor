@@ -61,6 +61,7 @@ class ClienteJKResource(resources.ModelResource):
 class ClienteJKAdmin(ImportExportModelAdmin):
     resource_class = ClienteJKResource
     list_display = ('nombre', 'tipo_documento', 'nro_documento')
+    search_fields = ('nombre', 'nro_documento')
 
 
 class TitularResource(resources.ModelResource):
@@ -124,6 +125,7 @@ class TitularResource(resources.ModelResource):
 class TitularAdmin(ImportExportModelAdmin):
     resource_class = TitularResource
     list_display = ('titular','descripcion','apellido','nombre')
+    search_fields = ('titular', 'apellido', 'nombre')
 
 
 class IsBarrioNormalizadoFilter(admin.SimpleListFilter):

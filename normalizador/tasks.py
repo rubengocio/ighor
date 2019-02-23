@@ -8,6 +8,8 @@ from normalizador.models import DiccionarioBarrio
 
 from celery import Celery
 
+from normalizador.models.calle import Calle
+
 app = Celery('normalizador', broker=settings.CELERY_BROKER_URL)
 
 logger = get_task_logger(__name__)
