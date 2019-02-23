@@ -52,10 +52,9 @@ class ReporteNormalizacionCallesBarrioAPIView(generics.RetrieveAPIView):
     """
     Devuelve un objeto con las cantidades de registros normalizados
 
-        "cantidad_calles_por_barrio": cantidad de calles por barrio
-	    "cantidad_registros_total": cantidad total de registros
-	    "cantidad_registros_calle_normalizado_por_barrio": cantidad de usuarios normalizados por barrio
-	    "cantidad_registros_calle_normalizado": cantidad de usuarios normalizados por calle
+        "cantidad_registros_diccionario": cantidad total de registros en el diccionario de calles
+	    "cantidad_registros_normalizados_diccionario": cantidad de registros normalizados en el diccionario de calles
+	    "cantidad_registros_normalizados_por_barrio_diccionario": cantidad de registros normalizados del barrio en el diccionario de calles
 
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -69,25 +68,21 @@ class ReporteNormalizacionCallesBarrioAPIView(generics.RetrieveAPIView):
         calle_id = str(instance.calle.id)
         barrio_id = str(instance.barrio.id)
 
-        query = " select count(*) as total_registros, "
-        query += " 	    sum(case when calle_id=" + calle_id + " and barrio_id=" + barrio_id + " then 1 else 0 end) as cant_registros_calle_normalizado, "
-        query += " 	    (select count(*) from normalizador_callesbarrio where normalizador_callesbarrio.barrio_id=" + barrio_id + ") as cant_calles_por_barrio, "
-        query += " 	    (select count(contacto_contactonormalizado.calle_id)  "
-        query += " 	     from normalizador_callesbarrio  "
-        query += " 	     inner join normalizador_calle on  normalizador_calle.id=normalizador_callesbarrio.calle_id "
-        query += " 	     inner join contacto_contactonormalizado on contacto_contactonormalizado.barrio_id=normalizador_callesbarrio.barrio_id and contacto_contactonormalizado.calle_id=normalizador_callesbarrio.calle_id  "
-        query += " 	     where normalizador_callesbarrio.barrio_id=" + barrio_id + ") as cant_registros_calle_normalizado_por_barrio  "
-        query += " from contacto_contactonormalizado  "
+        query = " select count(*) as  total_registros, "
+        query += " 	    count(case when normalizador_diccionariocalle.calle_barrio_id is null then null else normalizador_diccionariocalle.calle_barrio_id end) as cant_calle_normalizado, "
+        query += " 	    count(case when normalizador_callesbarrio.barrio_id = " + barrio_id + " then normalizador_diccionariocalle.calle_barrio_id else null end) as cant_calles_por_sector "
+        query += " from normalizador_calleincorrecta  "
+        query += "  left join normalizador_diccionariocalle on normalizador_diccionariocalle.calle_incorrecta_id = normalizador_calleincorrecta.id "
+        query += "  left join normalizador_callesbarrio on normalizador_callesbarrio .id = normalizador_diccionariocalle.calle_barrio_id "
 
         cursor = connection.cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
 
         result = {
-            'cantidad_registros_total': rows[0][0],
-            'cantidad_registros_calle_normalizado': rows[0][1],
-            'cantidad_calles_por_barrio': rows[0][2],
-            'cantidad_registros_calle_normalizado_por_barrio': rows[0][3],
+            'cantidad_registros_diccionario': rows[0][0],
+            'cantidad_registros_normalizados_diccionario': rows[0][1],
+            'cantidad_registros_normalizados_por_barrio_diccionario': rows[0][2],
         }
 
         return Response(result, status=status.HTTP_200_OK)
