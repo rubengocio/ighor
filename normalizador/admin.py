@@ -65,9 +65,9 @@ class CallesBarrioResource(resources.ModelResource):
         name = self.__class__
         try:
             try:
-                barrio = row['BARRIO'].strip()
-                calle = row['CALLE'].strip()
-                tipo_numeracion = row['TIPO_NUMERACION'].strip()
+                barrio = row['BARRIO']
+                calle = row['CALLE']
+                tipo_numeracion = row['TIPO_NUMERACION']
                 nomenclado = row['NOMENCLADO'].strip()
 
                 nomenclado = '1' if nomenclado == 'True' else '0'

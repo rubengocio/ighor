@@ -18,8 +18,9 @@ logger = get_task_logger(__name__)
 def quitar_espacios():
     logger.info("quitando espacios")
     print('paso')
-    Titular.quitar_espacios()
     Calle.quitar_espacios()
+    Titular.quitar_espacios()
+
 
 @app.task
 def actualizar_provincia():

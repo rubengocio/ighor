@@ -42,11 +42,11 @@ class Titular(models.Model):
     def quitar_espacios():
         try:
             query = ' update contacto_titular '
-            query += ' set domicilio_barrio=trim(domicilio_barrio), '
-            query += '  domicilio_calle=trim(domicilio_calle), '
-            query += '  provincia=trim(provincia), '
-            query += '  localidad=trim(localidad) '
-            query += '  nombre=trim(nombre) '
+            query += ' set domicilio_barrio=upper(trim(domicilio_barrio)), '
+            query += '  domicilio_calle=upper(trim(domicilio_calle)), '
+            query += '  provincia=upper(trim(provincia)), '
+            query += '  localidad=upper(trim(localidad)), '
+            query += '  nombre=trim(nombre), '
             query += '  apellido=trim(apellido) '
 
             cursor = connection.cursor()
