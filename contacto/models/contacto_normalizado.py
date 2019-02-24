@@ -55,7 +55,7 @@ class ContactoNormalizado(models.Model):
         query += ' SET barrio_id = (SELECT normalizador_diccionariobarrio.barrio_id '
         query += ' FROM contacto_titular   '
         query += ' INNER JOIN normalizador_diccionariobarrio ON contacto_titular.domicilio_barrio = normalizador_diccionariobarrio.nombre '
-        query += ' INNER JOIN normalizador_barrio ON normalizador_barrio.id = normalizador_diccionariobarrio.barrio_id '
+        query += ' INNER JOIN normalizador_barrio ON normalizador_barrio.id = normalizador_diccionariobarrio.barrio_id AND normalizador_barrio.estado=1 '
         query += ' INNER JOIN normalizador_cuadrante ON normalizador_cuadrante.id = normalizador_barrio.cuadrante_id AND normalizador_cuadrante.localidad_id = contacto_contactonormalizado.localidad_id '
         query += ' WHERE contacto_titular.titular = contacto_contactonormalizado.titular and contacto_titular.tipo = contacto_contactonormalizado.tipo '
         query += ' AND normalizador_diccionariobarrio.barrio_id is not null)  '
@@ -65,6 +65,7 @@ class ContactoNormalizado(models.Model):
             cursor.cursor.execute(query)
         except Exception as ex:
             exito = False
+            print(str(ex))
         finally:
             cursor.cursor.close()
 
@@ -122,6 +123,7 @@ class ContactoNormalizado(models.Model):
             cursor.cursor.execute(query)
         except Exception as ex:
             exito = False
+            print(str(ex))
         finally:
             cursor.cursor.close()
 
@@ -164,9 +166,9 @@ class ContactoNormalizado(models.Model):
         exito = True
 
         query = ' UPDATE contacto_contactonormalizado '
-        query += '  SET provincia_id = (SELECT normalizador_provincia.id '
+        query += '  SET provincia_id = (SELECT MAX(normalizador_provincia.id) '
         query += '      FROM contacto_titular '
-        query += '      INNER JOIN normalizador_provincia ON (normalizador_provincia.nombre=contacto_titular.provincia) '
+        query += '      INNER JOIN normalizador_provincia ON (normalizador_provincia.nombre=contacto_titular.provincia AND normalizador_provincia.estado=1) '
         query += '      WHERE contacto_contactonormalizado.titular=contacto_titular.titular AND contacto_contactonormalizado.tipo=contacto_titular.tipo) '
 
         try:
@@ -175,7 +177,6 @@ class ContactoNormalizado(models.Model):
         except Exception as ex:
             exito = False
             print(str(ex))
-            print(str(ex.message))
         finally:
             cursor.cursor.close()
 
@@ -188,7 +189,7 @@ class ContactoNormalizado(models.Model):
         query = ' UPDATE contacto_contactonormalizado '
         query += ' SET localidad_id = (SELECT normalizador_localidad.id '
         query += ' FROM contacto_titular '
-        query += ' INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id) '
+        query += ' INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id AND normalizador_localidad.estado=1) '
         query += ' WHERE contacto_titular.titular = contacto_contactonormalizado.titular AND contacto_titular.tipo = contacto_contactonormalizado.tipo) '
         query += ' WHERE contacto_contactonormalizado.provincia_id is not null '
 
@@ -197,6 +198,7 @@ class ContactoNormalizado(models.Model):
             cursor.execute(query)
         except Exception as ex:
             exito = False
+            print(str(ex))
         finally:
             cursor.close()
         return exito
