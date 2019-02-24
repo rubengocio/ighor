@@ -162,7 +162,9 @@ class NormalizadorCalleViewSet(mixins.CreateModelMixin,
                 calles_incorrectas=CalleIncorrecta.objects.filter(id__in=calles_mal)
                 diccionario_calles=[]
                 for calle_incorrecta in calles_incorrectas:
-                    if not DiccionarioCalle.objects.filter(calle_incorrecta=calle_incorrecta,calle_barrio=calle_barrio).exists():
+                    # elimino los registros del diccionario de calles que pertenecen a la calle incorrecta
+                    DiccionarioCalle.objects.filter(calle_barrio__barrio=calle_barrio.barrio, calle_incorrecta=calle_incorrecta).delete()
+                    if not DiccionarioCalle.objects.filter(calle_incorrecta=calle_incorrecta, calle_barrio=calle_barrio).exists():
                         diccionario_calles.append(
                             DiccionarioCalle.objects.create(
                                 calle_incorrecta=calle_incorrecta,
