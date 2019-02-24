@@ -113,7 +113,6 @@ class ContactoNormalizado(models.Model):
         query += '                      INNER JOIN normalizador_calleincorrecta ON normalizador_calleincorrecta.id = normalizador_diccionariocalle.calle_incorrecta_id '
         query += '                      INNER JOIN normalizador_callesbarrio ON normalizador_callesbarrio.id = normalizador_diccionariocalle.calle_barrio_id '
         query += '                      INNER JOIN normalizador_calle ON normalizador_calle.id = normalizador_callesbarrio.calle_id AND normalizador_calle.estado = 1 '
-        query += '                      INNER JOIN contacto_contactonormalizado p2 ON p2.barrio_id = normalizador_callesbarrio.barrio_id  '
         query += '                      INNER JOIN contacto_titular ON contacto_titular.domicilio_calle = normalizador_calleincorrecta.nombre '
         query += '                      WHERE contacto_titular.titular = contacto_contactonormalizado.titular '
         query += '                      AND contacto_titular.tipo = contacto_contactonormalizado.tipo '
