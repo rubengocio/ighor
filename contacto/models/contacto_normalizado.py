@@ -117,6 +117,7 @@ class ContactoNormalizado(models.Model):
         query += '                      WHERE contacto_titular.titular = contacto_contactonormalizado.titular '
         query += '                      AND contacto_titular.tipo = contacto_contactonormalizado.tipo '
         query += '                      AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id '
+        query += '                      AND contacto_contactonormalizado.barrio_id is not null )'
 
         try:
             cursor = connection.cursor()
