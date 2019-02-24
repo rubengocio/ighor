@@ -52,13 +52,15 @@ class ContactoNormalizado(models.Model):
         exito = True
 
         query = ' UPDATE contacto_contactonormalizado '
-        query += ' SET barrio_id = (SELECT normalizador_diccionariobarrio.barrio_id '
-        query += ' FROM contacto_titular   '
-        query += ' INNER JOIN normalizador_diccionariobarrio ON contacto_titular.domicilio_barrio = normalizador_diccionariobarrio.nombre '
-        query += ' INNER JOIN normalizador_barrio ON normalizador_barrio.id = normalizador_diccionariobarrio.barrio_id AND normalizador_barrio.estado=1 '
-        query += ' INNER JOIN normalizador_cuadrante ON normalizador_cuadrante.id = normalizador_barrio.cuadrante_id AND normalizador_cuadrante.localidad_id = contacto_contactonormalizado.localidad_id '
-        query += ' WHERE contacto_titular.titular = contacto_contactonormalizado.titular and contacto_titular.tipo = contacto_contactonormalizado.tipo '
-        query += ' AND normalizador_diccionariobarrio.barrio_id is not null)  '
+        query += '   SET barrio_id = (SELECT normalizador_diccionariobarrio.barrio_id '
+        query += '                  FROM contacto_titular   '
+        query += '                  INNER JOIN normalizador_diccionariobarrio ON contacto_titular.domicilio_barrio = normalizador_diccionariobarrio.nombre '
+        query += '                  INNER JOIN normalizador_barrio ON normalizador_barrio.id = normalizador_diccionariobarrio.barrio_id AND normalizador_barrio.estado=1 '
+        query += '                  INNER JOIN normalizador_cuadrante ON normalizador_cuadrante.id = normalizador_barrio.cuadrante_id '
+        query += '                  WHERE contacto_titular.titular = contacto_contactonormalizado.titular and contacto_titular.tipo = contacto_contactonormalizado.tipo '
+        query += '                  AND normalizador_cuadrante.localidad_id = contacto_contactonormalizado.localidad_id '
+        query += '                  AND normalizador_diccionariobarrio.barrio_id is not null) '
+        query += ' WHERE  localidad_id is not null'
 
         try:
             cursor = connection.cursor()
@@ -106,16 +108,18 @@ class ContactoNormalizado(models.Model):
         exito = True
 
         query = ' UPDATE contacto_contactonormalizado '
-        query += ' SET calle_id = (SELECT MAX(normalizador_calle.id) '
-        query += ' FROM normalizador_diccionariocalle '
-        query += ' INNER JOIN normalizador_calleincorrecta ON normalizador_calleincorrecta.id = normalizador_diccionariocalle.calle_incorrecta_id '
-        query += ' INNER JOIN normalizador_callesbarrio ON normalizador_callesbarrio.id = normalizador_diccionariocalle.calle_barrio_id AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id'
-        query += ' INNER JOIN normalizador_calle ON normalizador_calle.id = normalizador_callesbarrio.calle_id AND normalizador_calle.estado = 1 '
-        query += ' INNER JOIN contacto_contactonormalizado p2 ON p2.barrio_id = normalizador_callesbarrio.barrio_id  '
-        query += ' INNER JOIN contacto_titular ON contacto_titular.titular = p2.titular '
-        query += ' AND contacto_titular.tipo = p2.tipo '
-        query += ' AND contacto_titular.domicilio_calle = normalizador_calleincorrecta.nombre '
-        query += ' WHERE p2.titular = contacto_contactonormalizado.titular AND p2.tipo = contacto_contactonormalizado.tipo) '
+        query += '      SET calle_id = (SELECT MAX(normalizador_calle.id) '
+        query += '                      FROM normalizador_diccionariocalle '
+        query += '                      INNER JOIN normalizador_calleincorrecta ON normalizador_calleincorrecta.id = normalizador_diccionariocalle.calle_incorrecta_id '
+        query += '                      INNER JOIN normalizador_callesbarrio ON normalizador_callesbarrio.id = normalizador_diccionariocalle.calle_barrio_id '
+        query += '                      INNER JOIN normalizador_calle ON normalizador_calle.id = normalizador_callesbarrio.calle_id AND normalizador_calle.estado = 1 '
+        query += '                      INNER JOIN contacto_contactonormalizado p2 ON p2.barrio_id = normalizador_callesbarrio.barrio_id  '
+        query += '                      INNER JOIN contacto_titular ON contacto_titular.titular = p2.titular '
+        query += '                      AND contacto_titular.tipo = p2.tipo '
+        query += '                      AND contacto_titular.domicilio_calle = normalizador_calleincorrecta.nombre '
+        query += '                      WHERE p2.titular = contacto_contactonormalizado.titular '
+        query += '                      AND p2.tipo = contacto_contactonormalizado.tipo '
+        query += '                      AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id) '
         query += ' WHERE barrio_id is not null '
 
         try:
