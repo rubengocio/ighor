@@ -95,12 +95,17 @@ class Titular(models.Model):
                 return True
         return False
 
+    def normalizar_contacto(self):
+        contacto = ContactoNormalizado.objects.filter(titular=self.titular, tipo=self.tipo).first()
+        if contacto:
+            contacto.normalizado = False
+            contacto.save()
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
-        normalizado = True
         if self.has_normalized():
-            normalizado = False
+            self.normalizar_contacto()
 
         super(Titular, self).save()
 
@@ -113,7 +118,5 @@ class Titular(models.Model):
                 contacto.altura = self.domicilio_numero
                 contacto.piso = self.domicilio_piso
                 contacto.departamento = self.domicilio_depto
-                if normalizado is False:
-                    contacto.normalizado = normalizado
                 contacto.save()
 

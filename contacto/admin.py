@@ -130,6 +130,7 @@ class TitularAdmin(ImportExportModelAdmin):
 
         obj = super(TitularAdmin, self).save_form(request, form, change)
         if obj.has_normalized():
+            obj.normalizar_contacto()
             ejecutar_procesos()
 
         return obj
