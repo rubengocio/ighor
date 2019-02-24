@@ -188,9 +188,10 @@ class ContactoNormalizado(models.Model):
 
         query = ' UPDATE contacto_contactonormalizado '
         query += ' SET localidad_id = (SELECT normalizador_localidad.id '
-        query += ' FROM contacto_titular '
-        query += ' INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id AND normalizador_localidad.estado=1) '
-        query += ' WHERE contacto_titular.titular = contacto_contactonormalizado.titular AND contacto_titular.tipo = contacto_contactonormalizado.tipo) '
+        query += '      FROM contacto_titular '
+        query += '      INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND normalizador_localidad.estado=1) '
+        query += '      WHERE contacto_titular.titular = contacto_contactonormalizado.titular AND contacto_titular.tipo = contacto_contactonormalizado.tipo  '
+        query += '      AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id) '
         query += ' WHERE contacto_contactonormalizado.provincia_id is not null '
 
         try:
