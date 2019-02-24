@@ -174,6 +174,8 @@ class ContactoNormalizado(models.Model):
             cursor.cursor.execute(query)
         except Exception as ex:
             exito = False
+            print(str(ex))
+            print(str(ex.message))
         finally:
             cursor.cursor.close()
 
