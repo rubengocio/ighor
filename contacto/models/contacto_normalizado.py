@@ -59,8 +59,8 @@ class ContactoNormalizado(models.Model):
         query += '                  INNER JOIN normalizador_cuadrante ON normalizador_cuadrante.id = normalizador_barrio.cuadrante_id '
         query += '                  WHERE contacto_titular.titular = contacto_contactonormalizado.titular and contacto_titular.tipo = contacto_contactonormalizado.tipo '
         query += '                  AND normalizador_cuadrante.localidad_id = contacto_contactonormalizado.localidad_id '
-        query += '                  AND normalizador_diccionariobarrio.barrio_id is not null) '
-        query += ' WHERE  localidad_id is not null'
+        query += '                  AND normalizador_diccionariobarrio.barrio_id is not null '
+        query += '                  AND contacto_contactonormalizado.localidad_id is not null) '
 
         try:
             cursor = connection.cursor()
@@ -116,8 +116,7 @@ class ContactoNormalizado(models.Model):
         query += '                      INNER JOIN contacto_titular ON contacto_titular.domicilio_calle = normalizador_calleincorrecta.nombre '
         query += '                      WHERE contacto_titular.titular = contacto_contactonormalizado.titular '
         query += '                      AND contacto_titular.tipo = contacto_contactonormalizado.tipo '
-        query += '                      AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id) '
-        query += ' WHERE barrio_id is not null '
+        query += '                      AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id '
 
         try:
             cursor = connection.cursor()
