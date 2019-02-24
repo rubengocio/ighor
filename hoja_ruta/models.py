@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import OuterRef
 from django.db.models import Subquery
 
+from contacto import commons
 from contacto.models import ContactoNormalizado
 from contacto.models.cliente_jk import ClienteJK
 from normalizador.models.barrio import Barrio
@@ -144,7 +145,7 @@ class Producto(models.Model):
 class DetalleHojaRuta(models.Model):
     hoja_ruta = models.ForeignKey(HojaRuta, related_name='detalle_hoja_ruta')
     numero_orden = models.CharField(max_length=2)
-    tipo = models.IntegerField(blank=True, null=True, default=0)
+    tipo = models.IntegerField(blank=True, null=True, default=commons.DNI, choices=commons.TIPO_DOCUMENTO_CHOICES)
     titular = models.IntegerField(blank=True, null=True, default=0)
     observacion = models.ForeignKey(Observacion, null=True, blank=True)
     is_completa = models.BooleanField(default=False)
