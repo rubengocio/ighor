@@ -40,21 +40,23 @@ class Titular(models.Model):
 
     @staticmethod
     def quitar_espacios():
+        exito = True
         try:
-            query = ' update contacto_titular '
-            query += ' set domicilio_barrio=upper(trim(domicilio_barrio)), '
-            query += '  domicilio_calle=upper(trim(domicilio_calle)), '
-            query += '  provincia=upper(trim(provincia)), '
-            query += '  localidad=upper(trim(localidad)), '
+            query = ' UPDATE contacto_titular '
+            query += ' SET domicilio_barrio=UPPER(TRIM(domicilio_barrio)), '
+            query += '  domicilio_calle=UPPER(TRIM(domicilio_calle)), '
+            query += '  provincia=UPPER(TRIM(provincia)), '
+            query += '  localidad=UPPER(TRIM(localidad)), '
             query += '  nombre=trim(nombre), '
             query += '  apellido=trim(apellido) '
 
             cursor = connection.cursor()
-            cursor.execute(query)
-
-        except Exception:
-            return False
-        return True
+            cursor.cursor.execute(query)
+        except Exception as ex:
+            exito = False
+        finally:
+            cursor.cursor.close()
+        return exito
 
     def __str__(self):
         return u'%s - %s' % (str(self.tipo), str(self.titular))

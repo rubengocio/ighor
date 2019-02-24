@@ -13,6 +13,7 @@ class CalleIncorrecta(models.Model):
 
     @staticmethod
     def actualizar_calle_incorrecta(barrio_id):
+        exito = True
         try:
             query = ' INSERT INTO normalizador_calleincorrecta(nombre) '
             query += ' SELECT contacto_titular.domicilio_calle '
@@ -21,12 +22,14 @@ class CalleIncorrecta(models.Model):
             query += ' WHERE NOT EXISTS (SELECT 1 FROM normalizador_calleincorrecta WHERE normalizador_calleincorrecta.nombre=contacto_titular.domicilio_calle) '
             query += ' GROUP BY contacto_titular.domicilio_calle '
             query = query % str(barrio_id)
+
             cursor = connection.cursor()
             cursor.execute(query)
-
         except Exception as ex:
             print(ex)
-            return False
-        return True
+            exito = False
+        finally:
+            cursor.close()
+        return exito
 
 

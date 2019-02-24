@@ -17,13 +17,16 @@ class Calle(models.Model):
 
     @staticmethod
     def quitar_espacios():
+        exito = True
         try:
-            query = ' update normalizador_calle set nombre = trim(nombre) '
+            query = ' UPDATE normalizador_calle SET nombre = UPPER(TRIM(nombre)) '
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.cursor.execute(query)
 
         except Exception as ex:
             print(ex)
-            return False
-        return True
+            exito = False
+        finally:
+            cursor.cursor.close()
+        return exito
 

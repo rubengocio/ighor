@@ -30,6 +30,7 @@ class ContactoNormalizado(models.Model):
 
     @staticmethod
     def actualizar_contacto():
+        exito = True
         try:
             query = ' insert into contacto_contactonormalizado(tipo, titular, apellido, nombre, altura, piso, departamento, estado) '
             query += ' select tipo, titular, apellido, nombre, domicilio_numero, domicilio_piso, domicilio_depto,1 '
@@ -37,18 +38,43 @@ class ContactoNormalizado(models.Model):
             query += ' where not exists (select 1 from contacto_contactonormalizado where contacto_contactonormalizado.tipo=contacto_titular.tipo and contacto_contactonormalizado.titular=contacto_titular.titular) '
 
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.cursor.execute(query)
 
         except Exception as ex:
             print(ex.message)
-            return False
-        return True
+            exito = False
+        finally:
+            cursor.cursor.close()
+        return exito
+
+    @staticmethod
+    def actualizar_barrios():
+        exito = True
+
+        query = ' UPDATE contacto_contactonormalizado '
+        query += ' SET barrio_id = (SELECT normalizador_diccionariobarrio.barrio_id '
+        query += ' FROM contacto_titular   '
+        query += ' INNER JOIN normalizador_diccionariobarrio ON contacto_titular.domicilio_barrio = normalizador_diccionariobarrio.nombre '
+        query += ' INNER JOIN normalizador_barrio ON normalizador_barrio.id = normalizador_diccionariobarrio.barrio_id '
+        query += ' INNER JOIN normalizador_cuadrante ON normalizador_cuadrante.id = normalizador_barrio.cuadrante_id AND normalizador_cuadrante.localidad_id = contacto_contactonormalizado.localidad_id '
+        query += ' WHERE contacto_titular.titular = contacto_contactonormalizado.titular and contacto_titular.tipo = contacto_contactonormalizado.tipo '
+        query += ' AND normalizador_diccionariobarrio.barrio_id is not null)  '
+
+        try:
+            cursor = connection.cursor()
+            cursor.cursor.execute(query)
+        except Exception as ex:
+            exito = False
+        finally:
+            cursor.cursor.close()
+
+        return exito
 
     @staticmethod
     def actualizar_barrio(diccionario_barrios, barrio):
         cant = 0
         try:
-            barrios_incorrectos=diccionario_barrios.values_list('id', flat=True)
+            barrios_incorrectos = diccionario_barrios.values_list('id', flat=True)
 
             ids=','.join(str(x) for x in barrios_incorrectos)
 
@@ -70,7 +96,36 @@ class ContactoNormalizado(models.Model):
                 cant += 1
         except Exception as ex:
             pass
+        finally:
+            cursor.close()
         return cant
+
+    @staticmethod
+    def actualizar_calles():
+        exito = True
+
+        query = ' UPDATE contacto_contactonormalizado '
+        query += ' SET calle_id = (SELECT MAX(normalizador_calle.id) '
+        query += ' FROM normalizador_diccionariocalle '
+        query += ' INNER JOIN normalizador_calleincorrecta ON normalizador_calleincorrecta.id = normalizador_diccionariocalle.calle_incorrecta_id '
+        query += ' INNER JOIN normalizador_callesbarrio ON normalizador_callesbarrio.id = normalizador_diccionariocalle.calle_barrio_id AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id'
+        query += ' INNER JOIN normalizador_calle ON normalizador_calle.id = normalizador_callesbarrio.calle_id AND normalizador_calle.estado = 1 '
+        query += ' INNER JOIN contacto_contactonormalizado p2 ON p2.barrio_id = normalizador_callesbarrio.barrio_id  '
+        query += ' INNER JOIN contacto_titular ON contacto_titular.titular = p2.titular '
+        query += ' AND contacto_titular.tipo = p2.tipo '
+        query += ' AND contacto_titular.domicilio_calle = normalizador_calleincorrecta.nombre '
+        query += ' WHERE p2.titular = contacto_contactonormalizado.titular AND p2.tipo = contacto_contactonormalizado.tipo) '
+        query += ' WHERE barrio_id is not null '
+
+        try:
+            cursor = connection.cursor()
+            cursor.cursor.execute(query)
+        except Exception as ex:
+            exito = False
+        finally:
+            cursor.cursor.close()
+
+        return exito
 
     @staticmethod
     def actualizar_calle(diccionario_calles, calle_barrio):
@@ -100,46 +155,46 @@ class ContactoNormalizado(models.Model):
                 cant += 1
         except Exception:
             pass
+        finally:
+            cursor.close()
         return cant
 
     @staticmethod
     def actualizar_provincia():
+        exito = True
+
+        query = ' UPDATE contacto_contactonormalizado '
+        query += '  SET provincia_id = (SELECT normalizador_provincia.id '
+        query += '      FROM contacto_titular '
+        query += '      INNER JOIN normalizador_provincia ON (normalizador_provincia.nombre=contacto_titular.provincia) '
+        query += '      WHERE contacto_contactonormalizado.titular=contacto_titular.titular AND contacto_contactonormalizado.tipo=contacto_titular.tipo) '
+
         try:
-            query = ' UPDATE contacto_contactonormalizado '
-            query += ' SET provincia_id = %s '
-            query += ' WHERE contacto_contactonormalizado.id IN ( '
-            query += ' SELECT contacto_contactonormalizado.id '
-            query += ' FROM contacto_titular '
-            query += ' INNER JOIN normalizador_provincia ON (normalizador_provincia.nombre=contacto_titular.provincia AND normalizador_provincia.id=%s)  '
-            query += ' INNER JOIN contacto_contactonormalizado ON (contacto_contactonormalizado.tipo=contacto_titular.tipo AND contacto_contactonormalizado.titular=contacto_titular.titular) ) '
+            cursor = connection.cursor()
+            cursor.cursor.execute(query)
+        except Exception as ex:
+            exito = False
+        finally:
+            cursor.cursor.close()
 
-            provincias = Provincia.objects.all()
-            for provincia in provincias:
-                query_1 = query % (provincia.id, provincia.id)
-
-                cursor = connection.cursor()
-                cursor.execute(query_1)
-        except Exception:
-            pass
-        return True
+        return exito
 
     @staticmethod
     def actualizar_localidad():
+        exito = True
+
+        query = ' UPDATE contacto_contactonormalizado '
+        query += ' SET localidad_id = (SELECT normalizador_localidad.id '
+        query += ' FROM contacto_titular '
+        query += ' INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id) '
+        query += ' WHERE contacto_titular.titular = contacto_contactonormalizado.titular AND contacto_titular.tipo = contacto_contactonormalizado.tipo) '
+        query += ' WHERE contacto_contactonormalizado.provincia_id is not null '
+
         try:
-            query = ' UPDATE contacto_contactonormalizado '
-            query += ' SET localidad_id = %s '
-            query += ' WHERE contacto_contactonormalizado.id IN ( '
-            query += ' SELECT contacto_contactonormalizado.id '
-            query += ' FROM contacto_titular '
-            query += ' INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND normalizador_localidad.id=%s)  '
-            query += ' INNER JOIN contacto_contactonormalizado ON (contacto_contactonormalizado.tipo=contacto_titular.tipo AND contacto_contactonormalizado.titular=contacto_titular.titular) ) '
-
-            localidades = Localidad.objects.all()
-            for localidad in localidades:
-                query_1 = query % (localidad.id, localidad.id)
-
-                cursor = connection.cursor()
-                cursor.execute(query_1)
-        except Exception:
-            pass
-        return True
+            cursor = connection.cursor()
+            cursor.execute(query)
+        except Exception as ex:
+            exito = False
+        finally:
+            cursor.close()
+        return exito

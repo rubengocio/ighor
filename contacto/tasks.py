@@ -7,6 +7,8 @@ from contacto.models import Titular
 from celery import Celery
 
 from normalizador.models.calle import Calle
+from normalizador.models.localidad import Localidad
+from normalizador.models.provincia import Provincia
 
 app = Celery('contacto', broker=settings.CELERY_BROKER_URL)
 
@@ -18,6 +20,8 @@ logger = get_task_logger(__name__)
 def quitar_espacios():
     logger.info("quitando espacios")
     print('paso')
+    Provincia.quitar_espacios()
+    Localidad.quitar_espacios()
     Calle.quitar_espacios()
     Titular.quitar_espacios()
 
@@ -29,3 +33,11 @@ def actualizar_provincia():
 @app.task
 def actualizar_localidad():
     ContactoNormalizado.actualizar_localidad()
+
+@app.task
+def actualizar_barrio():
+    ContactoNormalizado.actualizar_barrios()
+
+@app.task
+def actualizar_calle():
+    ContactoNormalizado.actualizar_calles()

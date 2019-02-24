@@ -2,19 +2,19 @@ from django.contrib import admin
 
 # Register your models here.
 from django.db import IntegrityError
-
-from django.dispatch import receiver
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from import_export.fields import Field
-from import_export.signals import post_import
-from import_export.widgets import NumberWidget, Widget
 
 from contacto import commons
 from contacto.models import ContactoNormalizado
 from contacto.models.cliente_jk import ClienteJK
 from contacto.models.titular import Titular
-from contacto.tasks import quitar_espacios, actualizar_provincia, actualizar_localidad
+from import_export.signals import post_import
+from django.dispatch import receiver
+
+from contacto.tasks import quitar_espacios, actualizar_provincia, actualizar_localidad, actualizar_barrio, \
+    actualizar_calle
 from normalizador.tasks import actualizar_diccionario_barrio, actualizar_contacto
 
 
@@ -197,13 +197,17 @@ admin.site.register(ContactoNormalizado, ContactoNormalizadoAdmin)
 
 @receiver(post_import, dispatch_uid='_post_import')
 def _post_import(model, **kwargs):
-    # model is the actual model instance which after import
+    # quito los espacios en blanco
     quitar_espacios()
-
-    actualizar_provincia()
-
-    actualizar_localidad()
-
-    actualizar_diccionario_barrio()
-
+    # insert los nuevos contactos
     actualizar_contacto()
+    # actualizo la provincia de los contactos
+    actualizar_provincia()
+    # actualizo la localidad de los contactos
+    actualizar_localidad()
+    # actualizo los barrios de los contactos
+    actualizar_barrio()
+    # actualizo las calles de los contactos
+    actualizar_calle()
+    # actualizo el diccionario de barrios
+    actualizar_diccionario_barrio()

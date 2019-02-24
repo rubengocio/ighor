@@ -10,6 +10,7 @@ class DiccionarioBarrio(models.Model):
 
     @staticmethod
     def actualizar_diccionario_barrio():
+        exito = True
         try:
             query = ' insert into normalizador_diccionariobarrio(nombre) '
             query += ' select domicilio_barrio '
@@ -19,8 +20,10 @@ class DiccionarioBarrio(models.Model):
             query += ' group by domicilio_barrio '
 
             cursor = connection.cursor()
-            cursor.execute(query)
+            cursor.cursor.execute(query)
 
-        except Exception:
-            return False
-        return True
+        except Exception as ex:
+            exito = False
+        finally:
+            cursor.cursor.close()
+        return exito
