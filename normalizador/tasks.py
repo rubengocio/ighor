@@ -18,11 +18,13 @@ logger = get_task_logger(__name__)
 @app.task
 def actualizar_diccionario_barrio():
     logger.info("diccionario barrio")
+    print('actualizando diccionario de barrios')
     DiccionarioBarrio.actualizar_diccionario_barrio()
 
 @app.task
 def actualizar_contacto():
     logger.info("actualizar contacto")
+    print('actualizando contactos')
     ContactoNormalizado.actualizar_contacto()
 
 @app.task

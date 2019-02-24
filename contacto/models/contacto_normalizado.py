@@ -23,6 +23,7 @@ class ContactoNormalizado(models.Model):
     departamento=models.CharField(max_length=255, blank=True, null=True, default=None)
     observaciones=models.CharField(max_length=255, blank=True, null=True, default=None)
     estado = models.IntegerField(choices=ESTADO_CHOICES, db_index=True, default=ACTIVO)
+    normalizado = models.BooleanField(default=False, db_index=True)
     fecha_actualizacion=models.DateTimeField(blank=True, null=True)
 
     class Meta:
@@ -35,7 +36,9 @@ class ContactoNormalizado(models.Model):
             query = ' insert into contacto_contactonormalizado(tipo, titular, apellido, nombre, altura, piso, departamento, estado) '
             query += ' select tipo, titular, apellido, nombre, domicilio_numero, domicilio_piso, domicilio_depto,1 '
             query += ' from contacto_titular '
-            query += ' where not exists (select 1 from contacto_contactonormalizado where contacto_contactonormalizado.tipo=contacto_titular.tipo and contacto_contactonormalizado.titular=contacto_titular.titular) '
+            query += ' where not exists (select 1 from contacto_contactonormalizado   '
+            query += '                      where contacto_contactonormalizado.tipo=contacto_titular.tipo '
+            query += '                      and contacto_contactonormalizado.titular=contacto_titular.titular) '
 
             cursor = connection.cursor()
             cursor.cursor.execute(query)
@@ -61,6 +64,7 @@ class ContactoNormalizado(models.Model):
         query += '                  AND normalizador_cuadrante.localidad_id = contacto_contactonormalizado.localidad_id '
         query += '                  AND normalizador_diccionariobarrio.barrio_id is not null '
         query += '                  AND contacto_contactonormalizado.localidad_id is not null) '
+        query += '  WHERE normalizado=0 '
 
         try:
             cursor = connection.cursor()
@@ -117,7 +121,8 @@ class ContactoNormalizado(models.Model):
         query += '                      WHERE contacto_titular.titular = contacto_contactonormalizado.titular '
         query += '                      AND contacto_titular.tipo = contacto_contactonormalizado.tipo '
         query += '                      AND normalizador_callesbarrio.barrio_id = contacto_contactonormalizado.barrio_id '
-        query += '                      AND contacto_contactonormalizado.barrio_id is not null )'
+        query += '                      AND contacto_contactonormalizado.barrio_id is not null ) '
+        query += '  WHERE normalizado=0 '
 
         try:
             cursor = connection.cursor()
@@ -171,6 +176,7 @@ class ContactoNormalizado(models.Model):
         query += '      FROM contacto_titular '
         query += '      INNER JOIN normalizador_provincia ON (normalizador_provincia.nombre=contacto_titular.provincia AND normalizador_provincia.estado=1) '
         query += '      WHERE contacto_contactonormalizado.titular=contacto_titular.titular AND contacto_contactonormalizado.tipo=contacto_titular.tipo) '
+        query += '  WHERE normalizado=0 '
 
         try:
             cursor = connection.cursor()
@@ -189,11 +195,31 @@ class ContactoNormalizado(models.Model):
 
         query = ' UPDATE contacto_contactonormalizado '
         query += ' SET localidad_id = (SELECT normalizador_localidad.id '
-        query += '      FROM contacto_titular '
-        query += '      INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND normalizador_localidad.estado=1) '
-        query += '      WHERE contacto_titular.titular = contacto_contactonormalizado.titular AND contacto_titular.tipo = contacto_contactonormalizado.tipo  '
-        query += '      AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id) '
+        query += '          FROM contacto_titular '
+        query += '          INNER JOIN normalizador_localidad ON (normalizador_localidad.nombre=contacto_titular.localidad AND normalizador_localidad.estado=1) '
+        query += '          WHERE contacto_titular.titular = contacto_contactonormalizado.titular AND contacto_titular.tipo = contacto_contactonormalizado.tipo  '
+        query += '          AND contacto_contactonormalizado.provincia_id = normalizador_localidad.provincia_id) '
         query += ' WHERE contacto_contactonormalizado.provincia_id is not null '
+        query += ' AND normalizado=0 '
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query)
+        except Exception as ex:
+            exito = False
+            print(str(ex))
+        finally:
+            cursor.close()
+        return exito
+
+    @staticmethod
+    def actualizar_normalizados():
+        exito = True
+
+        query = ' UPDATE contacto_contactonormalizado '
+        query += ' SET normalizado = (CASE WHEN provincia_id is not null and localidad_id is not null and '
+        query += '                          barrio_id is not null and calle_id is not null THEN 1 else 0 END)'
+        query += ' WHERE normalizado=0 '
 
         try:
             cursor = connection.cursor()

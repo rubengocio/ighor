@@ -24,6 +24,7 @@ class DiccionarioBarrio(models.Model):
 
         except Exception as ex:
             exito = False
+            print(ex)
         finally:
             cursor.cursor.close()
         return exito

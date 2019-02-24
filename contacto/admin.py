@@ -14,7 +14,7 @@ from import_export.signals import post_import
 from django.dispatch import receiver
 
 from contacto.tasks import quitar_espacios, actualizar_provincia, actualizar_localidad, actualizar_barrio, \
-    actualizar_calle
+    actualizar_calle, actualizar_normalizados
 from normalizador.tasks import actualizar_diccionario_barrio, actualizar_contacto
 
 
@@ -116,7 +116,6 @@ class TitularResource(resources.ModelResource):
             except Exception as ex:
                 instance.fecha_nacimiento = 0
 
-            print(instance)
             super(name, self).save_instance(instance, using_transactions, dry_run)
         except IntegrityError:
             pass
@@ -126,6 +125,14 @@ class TitularAdmin(ImportExportModelAdmin):
     resource_class = TitularResource
     list_display = ('titular','descripcion','apellido','nombre')
     search_fields = ('titular', 'apellido', 'nombre')
+
+    def save_form(self, request, form, change):
+
+        obj = super(TitularAdmin, self).save_form(request, form, change)
+        if obj.has_normalized():
+            ejecutar_procesos()
+
+        return obj
 
 
 class IsBarrioNormalizadoFilter(admin.SimpleListFilter):
@@ -194,9 +201,7 @@ admin.site.register(Titular, TitularAdmin)
 admin.site.register(ClienteJK, ClienteJKAdmin)
 admin.site.register(ContactoNormalizado, ContactoNormalizadoAdmin)
 
-
-@receiver(post_import, dispatch_uid='_post_import')
-def _post_import(model, **kwargs):
+def ejecutar_procesos():
     # quito los espacios en blanco
     quitar_espacios()
     # insert los nuevos contactos
@@ -211,3 +216,12 @@ def _post_import(model, **kwargs):
     actualizar_calle()
     # actualizo el diccionario de barrios
     actualizar_diccionario_barrio()
+    # actualizo los contactos que se han normalizado
+    actualizar_normalizados()
+
+
+@receiver(post_import, dispatch_uid='_post_import')
+def _post_import(model, **kwargs):
+    # Solo ejecuto los procesos si se importa el modelo Titular
+    if model.__name__ == Titular.__name__:
+        ejecutar_procesos()

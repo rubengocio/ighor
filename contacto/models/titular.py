@@ -2,6 +2,7 @@
 from django.db import models, connection
 
 from contacto import commons
+from contacto.models import ContactoNormalizado
 
 
 class Titular(models.Model):
@@ -38,6 +39,21 @@ class Titular(models.Model):
     fecha_alta = models.IntegerField(blank=True, null=True, default=None)
     tipo_cuenta = models.CharField(max_length=1, blank=True, null=True, default=None)
 
+    def __init__(self, *args, **kwargs):
+        super(Titular, self).__init__(*args, **kwargs)
+        self.__important_fields = [
+            'domicilio_calle', 'domicilio_barrio', 'localidad', 'provincia'
+        ]
+        for field in self.__important_fields:
+            setattr(self, '__original_%s' % field, getattr(self, field))
+
+        self.__change_fields = [
+            'apellido', 'nombre', 'domicilio_numero', 'domicilio_piso', 'domicilio_depto'
+        ]
+
+        for field in self.__change_fields:
+            setattr(self, '__original_%s' % field, getattr(self, field))
+
     @staticmethod
     def quitar_espacios():
         exito = True
@@ -54,6 +70,7 @@ class Titular(models.Model):
             cursor.cursor.execute(query)
         except Exception as ex:
             exito = False
+            print(ex)
         finally:
             cursor.cursor.close()
         return exito
@@ -63,3 +80,40 @@ class Titular(models.Model):
 
     def __unicode__(self):
         return u'%s - %s' % (str(self.tipo), str(self.titular))
+
+    def has_normalized(self):
+        for field in self.__important_fields:
+            orig = '__original_%s' % field
+            if getattr(self, orig) != getattr(self, field):
+                return True
+        return False
+
+    def has_changed(self):
+        for field in self.__change_fields:
+            orig = '__original_%s' % field
+            if getattr(self, orig) != getattr(self, field):
+                return True
+        return False
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        normalizado = True
+        if self.has_normalized():
+            normalizado = False
+
+        super(Titular, self).save()
+
+        # si cambiaron los datos, busco el contacto normalizado y los actualizo
+        if self.has_changed():
+            contacto = ContactoNormalizado.objects.filter(titular=self.titular, tipo=self.tipo).first()
+            if contacto:
+                contacto.apellido = self.apellido
+                contacto.nombre = self.nombre
+                contacto.altura = self.domicilio_numero
+                contacto.piso = self.domicilio_piso
+                contacto.departamento = self.domicilio_depto
+                if normalizado is False:
+                    contacto.normalizado = normalizado
+                contacto.save()
+
