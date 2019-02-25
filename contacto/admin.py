@@ -126,14 +126,15 @@ class TitularAdmin(ImportExportModelAdmin):
     list_display = ('titular','descripcion','apellido','nombre')
     search_fields = ('titular', 'apellido', 'nombre')
 
-    def save_form(self, request, form, change):
-
-        obj = super(TitularAdmin, self).save_form(request, form, change)
+    def save_model(self, request, obj, form, change):
+        super(TitularAdmin, self).save_model(request, obj, form, change)
         if obj.has_normalized():
-            obj.normalizar_contacto()
+            # obj.normalizar_contacto()
             ejecutar_procesos()
 
         return obj
+
+
 
 
 class IsBarrioNormalizadoFilter(admin.SimpleListFilter):

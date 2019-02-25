@@ -111,7 +111,7 @@ class CallesBarrioResource(resources.ModelResource):
 class CallesBarrioAdmin(ImportExportModelAdmin):
     resource_class = CallesBarrioResource
     list_display = ('calle', 'altura_desde', 'altura_hasta', 'barrio', 'cuadrante', 'localidad', 'provincia')
-    search_fields = ('calle', 'barrio__nombre')
+    search_fields = ('calle__nombre', 'barrio__nombre')
 
     def cuadrante(self, obj):
         return obj.barrio.cuadrante.nombre

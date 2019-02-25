@@ -104,10 +104,10 @@ class Titular(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
+        super(Titular, self).save()
+
         if self.has_normalized():
             self.normalizar_contacto()
-
-        super(Titular, self).save()
 
         # si cambiaron los datos, busco el contacto normalizado y los actualizo
         if self.has_changed():
