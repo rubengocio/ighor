@@ -283,16 +283,16 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
         )
 
     def get_provincia(self, obj):
-        return obj.provincia.nombre
+        return obj.provincia.nombre if obj.provincia else ''
 
     def get_localidad(self, obj):
-        return obj.localidad.nombre
+        return obj.localidad.nombre if obj.localidad else ''
 
     def get_barrio(self, obj):
-        return obj.barrio.nombre
+        return obj.barrio.nombre if obj.barrio else ''
 
     def get_calle(self, obj):
-        return obj.calle.nombre
+        return obj.calle.nombre if obj.calle else ''
 
     def get_producto(self, obj):
 
