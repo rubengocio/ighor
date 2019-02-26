@@ -148,7 +148,7 @@ class DetalleHojaRuta(models.Model):
     numero_orden = models.CharField(max_length=2)
     tipo = models.IntegerField(blank=True, null=True, default=commons.DNI, choices=commons.TIPO_DOCUMENTO_CHOICES)
     titular = models.IntegerField(blank=True, null=True, default=0)
-    observacion = models.ForeignKey(Observacion, null=True, blank=True)
+    observacion = models.ForeignKey(Observacion, null=True, blank=True, on_delete=models.SET_NULL)
     is_completa = models.BooleanField(default=False)
 
     contact = None
