@@ -134,6 +134,7 @@ class Observacion(models.Model):
 
 class Producto(models.Model):
     nombre=models.CharField(max_length=125, unique=True)
+    codigo = models.CharField(max_length=10)
 
     def __str__(self):
         return u'%s' % self.nombre

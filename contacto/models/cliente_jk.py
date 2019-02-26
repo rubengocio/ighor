@@ -4,6 +4,7 @@ from django.db import models
 from contacto import commons
 
 
+
 class ClienteJK(models.Model):
     cod_cliente = models.CharField(max_length=255, blank=True, null=True, default=None)
     nombre = models.CharField(max_length=255, blank=True, null=True, default=None, db_index=True)
@@ -31,3 +32,7 @@ class ClienteJK(models.Model):
         verbose_name = 'Cliente JakeMate'
         verbose_name_plural = 'Clientes JakeMate'
 
+    def get_productos(self):
+        from hoja_ruta.models import Producto
+        productos = self.productos.strip().split(" ")
+        return Producto.objects.filter(codigo__in=productos)

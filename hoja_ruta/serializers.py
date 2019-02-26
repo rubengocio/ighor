@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from contacto.models import ContactoNormalizado
+from contacto.models.cliente_jk import ClienteJK
 from hoja_ruta.models import HojaRuta, DetalleHojaRuta, HistorialHojaRuta, Observacion, Producto, \
     ProductosDetalleHojaRuta
 from normalizador.enum import ACTIVO
@@ -254,16 +255,16 @@ class HojaRutaSerializer(serializers.ModelSerializer):
 
 
 class DetalleHojaRutaSerializer(serializers.ModelSerializer):
-    provincia=serializers.SerializerMethodField()
-    localidad=serializers.SerializerMethodField()
-    barrio=serializers.SerializerMethodField()
-    calle=serializers.SerializerMethodField()
-    producto=serializers.SerializerMethodField()
-    observacion=serializers.SerializerMethodField()
+    provincia = serializers.SerializerMethodField()
+    localidad = serializers.SerializerMethodField()
+    barrio = serializers.SerializerMethodField()
+    calle = serializers.SerializerMethodField()
+    producto = serializers.SerializerMethodField()
+    observacion = serializers.SerializerMethodField()
 
     class Meta:
-        model=DetalleHojaRuta
-        fields=(
+        model = DetalleHojaRuta
+        fields = (
             'id',
             'numero_orden',
             'tipo',
@@ -295,13 +296,26 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
         return obj.calle.nombre if obj.calle else ''
 
     def get_producto(self, obj):
+        tipo = obj.tipo
+        titular = obj.titular
 
-        if obj.detalle_productos.all().count() > 0:
+        cliente_jk = ClienteJK.objects.filter(tipo_documento=tipo, nro_documento=titular).first()
+
+        productos_jk = None
+        if cliente_jk:
+            productos_jk = cliente_jk.get_productos()
+
+        if obj.detalle_productos.all().count() > 0 or productos_jk.count() > 0:
             resutl = []
 
             detalle_productos = obj.detalle_productos.first()
 
-            for prodcut in detalle_productos.producto.all():
+            if detalle_productos:
+                products = (productos_jk | detalle_productos.producto.all()).distinct()
+            else:
+                products = productos_jk
+
+            for prodcut in products:
                 resutl.append({
                     'id': prodcut.id,
                     'nombre': prodcut.nombre
@@ -340,7 +354,7 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
                     id = ids['id']
                     producto= Producto.objects.get(id=id)
                     list.append(producto)
-                except Exception:
+                except Exception as ex:
                     pass
 
         except Exception:
