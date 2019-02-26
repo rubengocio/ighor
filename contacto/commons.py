@@ -9,7 +9,7 @@ TIPO_DOCUMENTO_CHOICES = (
     (DNI, 'DNI'),
     (LE, 'LE'),
     (LC, 'LC'),
-    (NN, 'NN')
+    (NN, 'Pasaporte')
 )
 
 
