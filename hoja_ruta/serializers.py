@@ -310,10 +310,12 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
 
             detalle_productos = obj.detalle_productos.first()
 
-            if detalle_productos:
+            if detalle_productos and productos_jk:
                 products = (productos_jk | detalle_productos.producto.all()).distinct()
-            else:
+            elif productos_jk:
                 products = productos_jk
+            else:
+                products = detalle_productos.producto.all()
 
             for prodcut in products:
                 resutl.append({
