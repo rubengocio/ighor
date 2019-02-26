@@ -261,6 +261,7 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
     calle = serializers.SerializerMethodField()
     producto = serializers.SerializerMethodField()
     observacion = serializers.SerializerMethodField()
+    tipo = serializers.SerializerMethodField()
 
     class Meta:
         model = DetalleHojaRuta
@@ -282,6 +283,9 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
             'observacion'
 
         )
+
+    def get_tipo(self, obj):
+        return obj.get_tipo_display()
 
     def get_provincia(self, obj):
         return obj.provincia.nombre if obj.provincia else ''
