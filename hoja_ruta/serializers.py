@@ -305,7 +305,7 @@ class DetalleHojaRutaSerializer(serializers.ModelSerializer):
         if cliente_jk:
             productos_jk = cliente_jk.get_productos()
 
-        if obj.detalle_productos.all().count() > 0 or productos_jk.count() > 0:
+        if (obj.detalle_productos and obj.detalle_productos.all().count()) > 0 or (productos_jk and productos_jk.count() > 0):
             resutl = []
 
             detalle_productos = obj.detalle_productos.first()
