@@ -5,7 +5,9 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from normalizador import errors
 from normalizador.enum import ACTIVO, INACTIVO
+from normalizador.models import DiccionarioBarrio
 from normalizador.models.cuadrante import Cuadrante
 from normalizador.serializers.cuadrante import CuadranteSerializer, CuadranteBarriosSerializer
 
@@ -45,11 +47,20 @@ class CuadranteViewSet(viewsets.ModelViewSet):
     serializer_class = CuadranteSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def validate_delete(self, obj):
+        if DiccionarioBarrio.objects.filter(barrio__cuadrante=obj).exists():
+            return False
+
+        return True
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.estado = INACTIVO
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if self.validate_delete(instance) is False:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={errors.ERROR_CUADRANTE})
+        else:
+            instance.estado = INACTIVO
+            instance.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

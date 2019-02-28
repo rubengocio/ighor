@@ -5,8 +5,13 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from contacto.models import ContactoNormalizado
+from normalizador import errors
 from normalizador.enum import ACTIVO, INACTIVO
+from normalizador.models import DiccionarioBarrio
+from normalizador.models import DiccionarioCalle
 from normalizador.models.calle import Calle
+from normalizador.models.calles_barrio import CallesBarrio
 from normalizador.serializers.calle import CalleSerializer
 
 
@@ -40,12 +45,26 @@ class CalleViewSet(viewsets.ModelViewSet):
     serializer_class = CalleSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def validate_delete(self, obj):
+        if ContactoNormalizado.objects.filter(calle=obj).exists():
+            return False
+
+        if CallesBarrio.objects.filter(calle=obj).exists():
+            return False
+
+        if DiccionarioCalle.objects.filter(calle_barrio__calle=obj).exists():
+            return False
+
+        return True
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.estado=INACTIVO
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if self.validate_delete(instance) is False:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={errors.ERROR_CALLE})
+        else:
+            instance.estado = INACTIVO
+            instance.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())

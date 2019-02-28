@@ -4,8 +4,12 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 
+from contacto.models import ContactoNormalizado
+from normalizador import errors
 from normalizador.enum import ACTIVO, INACTIVO
+from normalizador.models import DiccionarioBarrio
 from normalizador.models.barrio import Barrio
+from normalizador.models.calles_barrio import CallesBarrio
 from normalizador.serializers.barrio import BarrioSerializer
 
 
@@ -63,8 +67,23 @@ class BarrioViewSet(viewsets.ModelViewSet):
         }
         return Response(result)
 
+    def validate_delete(self, obj):
+        if ContactoNormalizado.objects.filter(barrio=obj).exists():
+            return False
+
+        if CallesBarrio.objects.filter(barrio=obj).exists():
+            return False
+
+        if DiccionarioBarrio.objects.filter(barrio=obj).exists():
+            return False
+
+        return True
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.estado=INACTIVO
-        instance.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if self.validate_delete(instance) is False:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={errors.ERROR_BARRIO})
+        else:
+            instance.estado = INACTIVO
+            instance.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
