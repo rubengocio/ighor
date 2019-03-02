@@ -46,15 +46,14 @@ class HojaRuta(models.Model):
         (DEVOLUCION_INCOMPLETA, u'Devolucion Incompleta')
     )
 
-
-    historial=models.ForeignKey(HistorialHojaRuta, related_name='hojas_ruta')
+    historial = models.ForeignKey(HistorialHojaRuta, related_name='hojas_ruta')
     numero = models.CharField(max_length=8, db_index=True)
     calle_barrio = models.ForeignKey(CallesBarrio)
     altura_desde = models.CharField(max_length=10, blank=True, null=True)
     altura_hasta = models.CharField(max_length=10, blank=True, null=True)
     cant_registros = models.IntegerField(default=0)
-    asignada_a=models.ForeignKey(User, null=True, blank=True)
-    estado=models.IntegerField(choices=CHOICES_ESTADO, default=SIN_ASIGNAR)
+    asignada_a = models.ForeignKey(User, null=True, blank=True)
+    estado = models.IntegerField(choices=CHOICES_ESTADO, default=SIN_ASIGNAR)
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -123,7 +122,8 @@ class HojaRuta(models.Model):
 
 
 class Observacion(models.Model):
-    nombre=models.CharField(max_length=125, unique=True)
+    nombre = models.CharField(max_length=125, unique=True)
+    borderColor = models.CharField(max_length=8, blank=True, null=True)
 
     def __str__(self):
         return u'%s' % self.nombre
@@ -150,6 +150,8 @@ class DetalleHojaRuta(models.Model):
     titular = models.IntegerField(blank=True, null=True, default=0)
     observacion = models.ForeignKey(Observacion, null=True, blank=True, on_delete=models.SET_NULL)
     is_completa = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     contact = None
     cliente_jk = None

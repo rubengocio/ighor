@@ -11,7 +11,8 @@ from normalizador.views.normalizador_barrio import NormalizadorBarrioViewSet
 from normalizador.views.normalizador_calle import NormalizadorCalleViewSet
 from normalizador.views.provincia import ProvinciaViewSet, ProvinciaLocalidadesRetrieveAPIView
 from normalizador.views.reporte import ReporteNormalizacionBarrioAPIView, ReporteNormalizacionCallesBarrioAPIView, \
-    ReporteContactosNormalizadosListAPIView, ReporteObservacionesPorVendedorListAPIView
+    ReporteContactosNormalizadosListAPIView, ReporteObservacionesPorVendedorListAPIView, \
+    ReporteObservacionesPorMesListAPIView, ReporteVendedoresPorObservacionListAPIView
 
 router = routers.DefaultRouter()
 router.register(r'provincia', ProvinciaViewSet)
@@ -34,7 +35,9 @@ urlpatterns += [
     url(r'^reporte_normalizacion_barrio/(?P<pk>[0-9]+)/$', ReporteNormalizacionBarrioAPIView.as_view()),
     url(r'^reporte_normalizacion_calle_barrio/(?P<pk>[0-9]+)/$', ReporteNormalizacionCallesBarrioAPIView.as_view()),
     url(r'^reporte_contactos_normalizados/$', ReporteContactosNormalizadosListAPIView.as_view()),
-    url(r'^reporte_observaciones_vendedor/$', ReporteObservacionesPorVendedorListAPIView.as_view())
+    url(r'^reporte_observaciones_vendedor/$', ReporteObservacionesPorVendedorListAPIView.as_view()),
+    url(r'^reporte_observaciones_mes/$', ReporteObservacionesPorMesListAPIView.as_view()),
+    url(r'^reporte_vendedores_observacion/$', ReporteVendedoresPorObservacionListAPIView.as_view())
 ]
 
 

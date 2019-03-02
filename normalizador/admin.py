@@ -6,6 +6,7 @@ from import_export.admin import ImportExportModelAdmin
 from normalizador.models import Criterio
 from normalizador.models import DiccionarioBarrio
 from normalizador.models import DiccionarioCalle
+from normalizador.models import Mes
 from normalizador.models.barrio import Barrio
 from normalizador.models.calle import Calle
 from normalizador.models.calles_barrio import CallesBarrio
@@ -133,6 +134,11 @@ class DiccionarioCalleAdmin(admin.ModelAdmin):
     search_fields = ('calle_barrio', 'calle_incorrecta')
 
 
+class MesAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'codigo')
+
+
+admin.site.register(Mes, MesAdmin)
 admin.site.register(Provincia, ProvinciaAdmin)
 admin.site.register(Localidad, LocalidadAdmin)
 admin.site.register(Cuadrante, CuadranteAdmin)

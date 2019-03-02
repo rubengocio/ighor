@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
 from django.db import connection
+from django.db.models import CharField
+from django.db.models import Value
+from django.db.models.functions import Concat
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.response import Response
 
 from contacto.models import ContactoNormalizado
+from hoja_ruta.models import DetalleHojaRuta, Observacion
 from normalizador.enum import ACTIVO
+from normalizador.models import Mes
 from normalizador.models.barrio import Barrio
 from normalizador.models.calles_barrio import CallesBarrio
 
@@ -91,7 +97,7 @@ class ReporteNormalizacionCallesBarrioAPIView(generics.RetrieveAPIView):
 
 class ReporteContactosNormalizadosListAPIView(generics.ListAPIView):
     """
-        Devuelve un listado de objetos con las cantidades de contactos normalizados
+        Devuelve un listado de objetos con las cantidades de contactos normalizados (Reporte 1)
 
         "nombre": provincia, localidad, cuadrante, barrio o ciudad (Segun lo seleccionado)
 	    "cantidad_no_clientes": cantidad de contactos normalizados que no son clientes
@@ -188,11 +194,7 @@ class ReporteContactosNormalizadosListAPIView(generics.ListAPIView):
 
 class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
     """
-        Devuelve un listado de objetos con las cantidades de observaciones
-
-            "id": id de observacion
-            "nombre": nombre de observacion
-            "cantidad": cantidad de observaciones
+        Devuelve un listado de objetos con las cantidades de observaciones (Reporte 2)
 
             filtros:
                 vendedor: id de vendedor
@@ -209,23 +211,26 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
 
             respuesta:
                 {
-                    "result": [
-                        {
-                            "nombre": "Cliente fallecido",
-                            "id": 3,
-                            "cantidad": 0
-                        },
-                        {
-                            "nombre": "No tiene tarjeta",
-                            "id": 2,
-                            "cantidad": 0
-                        },
-                        {
-                            "nombre": "No vive más alli",
-                            "id": 1,
-                            "cantidad": 0
-                        }
-                    ]
+                    "result": {
+                        "datasets": [
+                            {
+                                "data": [ 1],
+                                "borderColor": "#FFCA33",
+                                "label": "Cliente fallecido"
+                            },
+                            {
+                                "data": [ 6],
+                                "borderColor": "#61FF33",
+                                "label": "No tiene tarjeta"
+                            },
+                            {
+                                "data": [ 3],
+                                "borderColor": "#3336FF",
+                                "label": "No vive más alli"
+                            }
+                        ],
+                        "labels": [ "Cliente fallecido", "No tiene tarjeta", "No vive más alli" ]
+                    }
                 }
     """
     permission_classes = [permissions.IsAuthenticated]
@@ -250,6 +255,7 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
 
         query = " select hoja_ruta_observacion.id,  "
         query += "       hoja_ruta_observacion.nombre, "
+        query += "       hoja_ruta_observacion.borderColor, "
         query += "       (case when x.cantidad is null then 0 else x.cantidad end) as cantidad "
         query += " from hoja_ruta_observacion "
         query += " left join (select hoja_ruta_detallehojaruta.observacion_id, "
@@ -273,9 +279,191 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
 
         for row in rows:
             data.append({
-                'id': row[0],
-                'nombre': row[1],
-                'cantidad': row[2],
+                #'id': row[0],
+                'label': row[1],
+                'borderColor': row[2],
+                'data': [row[3]],
             })
 
-        return Response({'result': data})
+        labels = Observacion.objects.all().order_by('nombre').values_list('nombre', flat=True)
+
+        result = {
+            'labels': labels,
+            'datasets': data
+        }
+
+        return Response({'result': result})
+
+
+class ReporteObservacionesPorMesListAPIView(generics.ListAPIView):
+    """
+        Devuelve un listado de objetos con las cantidades de observaciones por mes (Reporte 3)
+
+            filtros:
+                anio: anio seleccionado
+
+            ejemplos:
+                http://localhost:8000/v1/reporte_observaciones_mes/
+                http://localhost:8000/v1/reporte_observaciones_mes/?anio=2018
+
+            respuesta:
+                {
+                    "result": {
+                        "datasets": [
+                            {
+                                "label": "No vive más alli",
+                                "data": [ 0,0,0,0,0,0,0,0,0,0,1,0],
+                                "borderColor": "#3336FF"
+                            },
+                            {
+                                "label": "No tiene tarjeta",
+                                "data": [ 0,0,0,0,0,0,0,0,0,0,1,0],
+                                "borderColor": "#61FF33"
+                            },
+                            {
+                                "label": "Cliente fallecido",
+                                "data": [ 0,0,0,0,0,0,0,0,0,0,1,0],
+                                "borderColor": "#FFCA33"
+                            }
+                        ],
+                        "labels": [
+                            "Enero",
+                            "Febrero",
+                            "Marzo",
+                            "Abril",
+                            "Mayo",
+                            "Junio",
+                            "Julio",
+                            "Agosto",
+                            "Septiembre",
+                            "Octubre",
+                            "Noviembre",
+                            "Diciembre"
+                        ]
+                    }
+                }
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        result = {}
+        observaciones = Observacion.objects.all()
+
+        detalles = DetalleHojaRuta.objects.filter(observacion__isnull=False)
+
+        anio = request.GET.get('anio', None)
+
+        if anio:
+            detalles = detalles.filter(hoja_ruta__fecha__year=anio)
+
+        meses = Mes.objects.all().order_by('codigo')
+        labels = meses.values_list('nombre', flat=True)
+
+        datasets = []
+
+        for observacion in observaciones:
+            label = observacion.nombre
+            data = []
+            for mes in meses:
+                value = detalles.filter(
+                    observacion=observacion,
+                    hoja_ruta__fecha__month=mes.codigo
+                ).count()
+                data.append(value)
+            dataset = {
+                'label': label,
+                'data': data,
+                'borderColor': observacion.borderColor
+            }
+
+            datasets.append(dataset)
+
+            result.update({'labels': labels})
+        result.update({'datasets': datasets})
+
+        return Response({'result': result})
+
+
+class ReporteVendedoresPorObservacionListAPIView(generics.ListAPIView):
+    """
+        Devuelve un listado de objetos con las cantidades de observaciones por mes (Reporte 4)
+
+            filtros:
+                observacion: id de observacion
+                fecha_desde: fecha desde
+                fecha_hasta: fecha hasta
+
+            ejemplos:
+                http://localhost:8000/v1/reporte_vendedores_observacion/
+                http://localhost:8000/v1/reporte_vendedores_observacion/?observacion=1
+                http://localhost:8000/v1/reporte_vendedores_observacion/?fecha_desde=2018-01-01
+                http://localhost:8000/v1/reporte_vendedores_observacion/?fecha_hasta=2018-12-31
+                http://localhost:8000/v1/reporte_vendedores_observacion/?fecha_desde=2018-01-01&fecha_hasta=2018-12-31
+                http://localhost:8000/v1/reporte_vendedores_observacion/?fecha_desde=2018-01-01&fecha_hasta=2018-12-31&observacion=1
+
+            respuesta:
+                {
+                    "result": {
+                        "labels": [
+                            "Vendedor 1", "Vendedor 2", "Vendedor 3"
+                        ],
+                        "datasets": [
+                            {
+                                "label": "Vendedores",
+                                "data": [
+                                    1, 4, 2
+                                ],
+                                "borderColor": "#1E88E5"
+                            }
+                        ]
+                    }
+                }
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        result = {}
+        # busco los vendedores
+        vendedores = User.objects.filter(groups__name='VENDEDOR').distinct().order_by('first_name', 'last_name')
+
+        detalles = DetalleHojaRuta.objects.filter(observacion__isnull=False)
+
+        observacion = request.GET.get('observacion', None)
+        fecha_desde = request.GET.get('fecha_desde', None)
+        fecha_hasta = request.GET.get('fecha_hasta', None)
+
+        if observacion:
+            detalles = detalles.filter(observacion=observacion)
+
+        if fecha_desde:
+            detalles = detalles.filter(hoja_ruta__fecha__date__gte=fecha_desde)
+
+        if fecha_hasta:
+            detalles = detalles.filter(hoja_ruta__fecha__date__lte=fecha_hasta)
+
+        labels = vendedores.annotate(
+            full_name=Concat(
+                'first_name',
+                Value(' '),
+                'last_name',
+                output_field=CharField())
+            ).values_list('full_name', flat=True)
+
+        datasets = []
+        label = 'Vendedores'
+        data = []
+        for vendedor in vendedores:
+            cantidad = detalles.filter(hoja_ruta__asignada_a=vendedor).count()
+            data.append(cantidad)
+
+        dataset = {
+            'label': label,
+            'data': data,
+            'borderColor': '#1E88E5'
+        }
+
+        datasets.append(dataset)
+        result.update({'labels': labels})
+        result.update({'datasets': datasets})
+
+        return Response({'result': result})
