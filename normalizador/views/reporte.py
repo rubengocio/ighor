@@ -184,3 +184,98 @@ class ReporteContactosNormalizadosListAPIView(generics.ListAPIView):
             })
 
         return Response({'result': data})
+
+
+class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
+    """
+        Devuelve un listado de objetos con las cantidades de observaciones
+
+        "id": id de observacion
+        "nombre": nombre de observacion
+        "cantidad": cantidad de observaciones
+
+        filtros:
+            vendedor: id de vendedor
+            fecha_desde: fecha desde
+            fecha_hasta: fecha hasta
+
+        ejemplos:
+            http://localhost:8000/v1/reporte_observaciones_vendedor/
+            http://localhost:8000/v1/reporte_observaciones_vendedor/?vendedor=1
+            http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_desde=2019-01-01
+            http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_hasta=2019-12-31
+            http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_desde=2019-01-01&fecha_hasta=2019-12-31
+            http://localhost:8000/v1/reporte_observaciones_vendedor/?vendedor=1&fecha_desde=2019-01-01&fecha_hasta=2019-12-31
+
+        respuesta:
+            {
+                "result": [
+                    {
+                        "nombre": "Cliente fallecido",
+                        "id": 3,
+                        "cantidad": 0
+                    },
+                    {
+                        "nombre": "No tiene tarjeta",
+                        "id": 2,
+                        "cantidad": 0
+                    },
+                    {
+                        "nombre": "No vive más alli",
+                        "id": 1,
+                        "cantidad": 0
+                    }
+                ]
+            }
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        data = []
+
+        vendedor = request.GET.get('vendedor', None)
+        fecha_desde = request.GET.get('fecha_desde', None)
+        fecha_hasta = request.GET.get('fecha_hasta', None)
+
+        where = " "
+
+        if vendedor:
+            where += " and hoja_ruta_hojaruta.asignada_a_id = {} ".format(vendedor)
+
+        if fecha_desde:
+            where += " and date(hoja_ruta_hojaruta.fecha) >= '{}' ".format(fecha_desde)
+
+        if fecha_hasta:
+            where += " and date(hoja_ruta_hojaruta.fecha) <= '{}' ".format(fecha_hasta)
+
+        query = " select hoja_ruta_observacion.id,  "
+        query += "       hoja_ruta_observacion.nombre, "
+        query += "       (case when x.cantidad is null then 0 else x.cantidad end) as cantidad "
+        query += " from hoja_ruta_observacion "
+        query += " left join (select hoja_ruta_detallehojaruta.observacion_id, "
+        query += "                  count(*) as cantidad "
+        query += "              from hoja_ruta_hojaruta "
+        query += "              inner join hoja_ruta_detallehojaruta on hoja_ruta_detallehojaruta.hoja_ruta_id = hoja_ruta_hojaruta.id "
+        query += "              where hoja_ruta_detallehojaruta.observacion_id is not null "
+        query += where
+        query += "              group by hoja_ruta_detallehojaruta.observacion_id) as x on x.observacion_id = hoja_ruta_observacion.id "
+        query += " order by hoja_ruta_observacion.nombre "
+
+        rows = []
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            rows = cursor.fetchall()
+        except Exception as ex:
+            pass
+        finally:
+            cursor.close()
+
+        for row in rows:
+            data.append({
+                'id': row[0],
+                'nombre': row[1],
+                'cantidad': row[2],
+            })
+
+        return Response({'result': data})
