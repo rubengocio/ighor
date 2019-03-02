@@ -151,7 +151,7 @@ class DetalleHojaRuta(models.Model):
     observacion = models.ForeignKey(Observacion, null=True, blank=True, on_delete=models.SET_NULL)
     is_completa = models.BooleanField(default=False)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     contact = None
     cliente_jk = None

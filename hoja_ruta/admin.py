@@ -22,6 +22,7 @@ class DetalleHojaRutaInline(admin.TabularInline):
         'piso',
         'departamento',
         'observacion',
+        'fecha_actualizacion',
    )
     exclude = ('id', 'is_completa')
 
