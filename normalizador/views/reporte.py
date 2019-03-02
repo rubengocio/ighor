@@ -190,43 +190,43 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
     """
         Devuelve un listado de objetos con las cantidades de observaciones
 
-        "id": id de observacion
-        "nombre": nombre de observacion
-        "cantidad": cantidad de observaciones
+            "id": id de observacion
+            "nombre": nombre de observacion
+            "cantidad": cantidad de observaciones
 
-        filtros:
-            vendedor: id de vendedor
-            fecha_desde: fecha desde
-            fecha_hasta: fecha hasta
+            filtros:
+                vendedor: id de vendedor
+                fecha_desde: fecha desde
+                fecha_hasta: fecha hasta
 
-        ejemplos:
-            http://localhost:8000/v1/reporte_observaciones_vendedor/
-            http://localhost:8000/v1/reporte_observaciones_vendedor/?vendedor=1
-            http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_desde=2019-01-01
-            http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_hasta=2019-12-31
-            http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_desde=2019-01-01&fecha_hasta=2019-12-31
-            http://localhost:8000/v1/reporte_observaciones_vendedor/?vendedor=1&fecha_desde=2019-01-01&fecha_hasta=2019-12-31
+            ejemplos:
+                http://localhost:8000/v1/reporte_observaciones_vendedor/
+                http://localhost:8000/v1/reporte_observaciones_vendedor/?vendedor=1
+                http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_desde=2019-01-01
+                http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_hasta=2019-12-31
+                http://localhost:8000/v1/reporte_observaciones_vendedor/?fecha_desde=2019-01-01&fecha_hasta=2019-12-31
+                http://localhost:8000/v1/reporte_observaciones_vendedor/?vendedor=1&fecha_desde=2019-01-01&fecha_hasta=2019-12-31
 
-        respuesta:
-            {
-                "result": [
-                    {
-                        "nombre": "Cliente fallecido",
-                        "id": 3,
-                        "cantidad": 0
-                    },
-                    {
-                        "nombre": "No tiene tarjeta",
-                        "id": 2,
-                        "cantidad": 0
-                    },
-                    {
-                        "nombre": "No vive más alli",
-                        "id": 1,
-                        "cantidad": 0
-                    }
-                ]
-            }
+            respuesta:
+                {
+                    "result": [
+                        {
+                            "nombre": "Cliente fallecido",
+                            "id": 3,
+                            "cantidad": 0
+                        },
+                        {
+                            "nombre": "No tiene tarjeta",
+                            "id": 2,
+                            "cantidad": 0
+                        },
+                        {
+                            "nombre": "No vive más alli",
+                            "id": 1,
+                            "cantidad": 0
+                        }
+                    ]
+                }
     """
     permission_classes = [permissions.IsAuthenticated]
 
