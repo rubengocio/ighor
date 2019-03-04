@@ -214,29 +214,28 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
                     "result": {
                         "datasets": [
                             {
-                                "data": [ 1],
-                                "borderColor": "#FFCA33",
-                                "label": "Cliente fallecido"
-                            },
-                            {
-                                "data": [ 6],
-                                "borderColor": "#61FF33",
-                                "label": "No tiene tarjeta"
-                            },
-                            {
-                                "data": [ 3],
+                                "label": "Observaciones",
+                                "backgroundColor": "#3336FF",
                                 "borderColor": "#3336FF",
-                                "label": "No vive más alli"
+                                "data": [
+                                    1,
+                                    1,
+                                    1
+                                ]
                             }
                         ],
-                        "labels": [ "Cliente fallecido", "No tiene tarjeta", "No vive más alli" ]
+                        "labels": [
+                            "Cliente fallecido",
+                            "No tiene tarjeta",
+                            "No vive más alli"
+                        ]
                     }
                 }
     """
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
-        data = []
+        dataset = []
 
         vendedor = request.GET.get('vendedor', None)
         fecha_desde = request.GET.get('fecha_desde', None)
@@ -277,19 +276,28 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
         finally:
             cursor.close()
 
+        label = 'Observaciones'
+        borderColor = None
+        backgroundColor = None
+        data = []
+
         for row in rows:
-            data.append({
-                #'id': row[0],
-                'label': row[1],
-                'borderColor': row[2],
-                'data': [row[3]],
-            })
+            borderColor = str(row[2]),
+            backgroundColor = str(row[2]),
+            data.append(row[3])
+
+        dataset.append({
+            'label': label,
+            'borderColor': borderColor[0],
+            'backgroundColor': backgroundColor[0],
+            'data': data,
+        })
 
         labels = Observacion.objects.all().order_by('nombre').values_list('nombre', flat=True)
 
         result = {
             'labels': labels,
-            'datasets': data
+            'datasets': dataset
         }
 
         return Response({'result': result})
@@ -373,7 +381,8 @@ class ReporteObservacionesPorMesListAPIView(generics.ListAPIView):
             dataset = {
                 'label': label,
                 'data': data,
-                'borderColor': observacion.borderColor
+                'borderColor': observacion.borderColor,
+                'backgroundColor': observacion.borderColor,
             }
 
             datasets.append(dataset)
@@ -459,7 +468,8 @@ class ReporteVendedoresPorObservacionListAPIView(generics.ListAPIView):
         dataset = {
             'label': label,
             'data': data,
-            'borderColor': '#1E88E5'
+            'borderColor': '#1E88E5',
+            'backgroundColor': '#1E88E5',
         }
 
         datasets.append(dataset)
