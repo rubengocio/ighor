@@ -221,7 +221,8 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
                                     1,
                                     1,
                                     1
-                                ]
+                                ],
+                                "fill": true,
                             }
                         ],
                         "labels": [
@@ -290,6 +291,7 @@ class ReporteObservacionesPorVendedorListAPIView(generics.ListAPIView):
             'label': label,
             'borderColor': borderColor[0],
             'backgroundColor': backgroundColor[0],
+            'fill': True,
             'data': data,
         })
 
@@ -321,17 +323,23 @@ class ReporteObservacionesPorMesListAPIView(generics.ListAPIView):
                             {
                                 "label": "No vive más alli",
                                 "data": [ 0,0,0,0,0,0,0,0,0,0,1,0],
-                                "borderColor": "#3336FF"
+                                "borderColor": "#3336FF",
+                                "backgroundColor": "#3336FF",
+                                "fill": false,
                             },
                             {
                                 "label": "No tiene tarjeta",
                                 "data": [ 0,0,0,0,0,0,0,0,0,0,1,0],
-                                "borderColor": "#61FF33"
+                                "borderColor": "#61FF33",
+                                "backgroundColor": "#61FF33",
+                                "fill": false,
                             },
                             {
                                 "label": "Cliente fallecido",
                                 "data": [ 0,0,0,0,0,0,0,0,0,0,1,0],
-                                "borderColor": "#FFCA33"
+                                "borderColor": "#FFCA33",
+                                "backgroundColor": "#FFCA33",
+                                "fill": false,
                             }
                         ],
                         "labels": [
@@ -383,6 +391,7 @@ class ReporteObservacionesPorMesListAPIView(generics.ListAPIView):
                 'data': data,
                 'borderColor': observacion.borderColor,
                 'backgroundColor': observacion.borderColor,
+                'fill': False,
             }
 
             datasets.append(dataset)
@@ -422,7 +431,9 @@ class ReporteVendedoresPorObservacionListAPIView(generics.ListAPIView):
                                 "data": [
                                     1, 4, 2
                                 ],
-                                "borderColor": "#1E88E5"
+                                "borderColor": "#1E88E5",
+                                "backgroundColor": "#1E88E5",
+                                "fill": true,
                             }
                         ]
                     }
@@ -470,6 +481,7 @@ class ReporteVendedoresPorObservacionListAPIView(generics.ListAPIView):
             'data': data,
             'borderColor': '#1E88E5',
             'backgroundColor': '#1E88E5',
+            'fill': True,
         }
 
         datasets.append(dataset)
