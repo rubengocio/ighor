@@ -44,7 +44,7 @@ PyPDF2==1.26.0
 pytz==2018.5
 PyYAML==3.13
 redis==2.10.6
-reportlab==3.5.9
+reportlab==3.5.55
 requests==2.19.1
 simplejson==3.16.0
 six==1.11.0
